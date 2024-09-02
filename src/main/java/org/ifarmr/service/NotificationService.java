@@ -1,7 +1,5 @@
 package org.ifarmr.service;
 
-import org.ifarmr.entity.Notification;
-import org.ifarmr.enums.NotificationType;
 import org.ifarmr.payload.request.NotificationRequest;
 import org.ifarmr.payload.request.RecentActivityDto;
 

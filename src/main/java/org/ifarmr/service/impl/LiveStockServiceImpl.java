@@ -7,6 +7,7 @@ import org.ifarmr.exceptions.ConflictException;
 import org.ifarmr.exceptions.IFarmServiceException;
 import org.ifarmr.exceptions.NotFoundException;
 import org.ifarmr.payload.request.LiveStockRequest;
+import org.ifarmr.payload.request.NotificationRequest;
 import org.ifarmr.payload.response.LiveStockInfo;
 import org.ifarmr.payload.response.LiveStockResponse;
 import org.ifarmr.payload.response.LivestockSummaryInfo;
@@ -15,6 +16,7 @@ import org.ifarmr.repository.LiveStockRepository;
 import org.ifarmr.repository.UserRepository;
 import org.ifarmr.service.GlobalUploadService;
 import org.ifarmr.service.LiveStockService;
+import org.ifarmr.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,9 @@ public class LiveStockServiceImpl implements LiveStockService {
 
     @Autowired
     private GlobalUploadService globalUploadService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Override
     public LiveStockResponse addLiveStock(LiveStockRequest liveStockRequest, String username) {
@@ -71,6 +76,13 @@ public class LiveStockServiceImpl implements LiveStockService {
 
             // Save the livestock entity to the database
             LiveStock savedLiveStock = liveStockRepository.save(liveStock);
+
+            // SEND NOTIFICATION TO USER
+            NotificationRequest notificationRequest = new NotificationRequest();
+            notificationRequest.setTitle("New Livestock Added");
+            notificationRequest.setBody("A new Livestock has been added with name: " + liveStockRequest.getAnimalName());
+            notificationRequest.setTopic("Livestock Notifications");
+            notificationService.sendNotificationToUser(user.getId(), notificationRequest);
 
             // Build and return the response
             return LiveStockResponse.builder()

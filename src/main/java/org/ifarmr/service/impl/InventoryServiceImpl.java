@@ -11,10 +11,12 @@ import org.ifarmr.exceptions.FileUploadException;
 import org.ifarmr.exceptions.FunctionErrorException;
 import org.ifarmr.exceptions.NotFoundException;
 import org.ifarmr.payload.request.InventoryRequest;
+import org.ifarmr.payload.request.NotificationRequest;
 import org.ifarmr.payload.response.InventoryResponse;
 import org.ifarmr.repository.InventoryRepository;
 import org.ifarmr.repository.UserRepository;
 import org.ifarmr.service.InventoryService;
+import org.ifarmr.service.NotificationService;
 import org.ifarmr.utils.FileUploadUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +31,7 @@ public class InventoryServiceImpl implements InventoryService {
     private final InventoryRepository inventoryRepository;
     private final UserRepository userRepository;
     private final Cloudinary cloudinary;
+    private final NotificationService notificationService;
 
 
     @Override
@@ -66,6 +69,14 @@ public class InventoryServiceImpl implements InventoryService {
                .build();
         try{
             inventoryRepository.save(newInventory);
+
+            // SEND NOTIFICATION TO USER
+            NotificationRequest notificationRequest = new NotificationRequest();
+            notificationRequest.setTitle("New Inventory Added");
+            notificationRequest.setBody("A new inventory has been created with name: " + inventoryRequest.getName());
+            notificationRequest.setTopic("Inventory Notifications");
+            notificationService.sendNotificationToUser(user.getId(), notificationRequest);
+
         }catch (Exception e){
             throw new FunctionErrorException("Unable to save your inventory");
         }

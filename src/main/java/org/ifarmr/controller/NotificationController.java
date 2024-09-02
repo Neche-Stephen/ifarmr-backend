@@ -1,7 +1,6 @@
 package org.ifarmr.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.ifarmr.entity.Notification;
 import org.ifarmr.payload.request.NotificationRequest;
 import org.ifarmr.payload.request.RecentActivityDto;
 import org.ifarmr.payload.response.NotificationResponse;

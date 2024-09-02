@@ -6,11 +6,13 @@ import org.ifarmr.exceptions.ConflictException;
 import org.ifarmr.exceptions.IFarmServiceException;
 import org.ifarmr.exceptions.NotFoundException;
 import org.ifarmr.payload.request.NewTaskRequest;
+import org.ifarmr.payload.request.NotificationRequest;
 import org.ifarmr.payload.response.TaskInfo;
 import org.ifarmr.payload.response.TaskResponseDto;
 import org.ifarmr.payload.response.UpcomingTaskResponse;
 import org.ifarmr.repository.TaskRepository;
 import org.ifarmr.repository.UserRepository;
+import org.ifarmr.service.NotificationService;
 import org.ifarmr.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,9 @@ public class TaskServiceImpl implements TaskService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
 
     @Override
@@ -54,6 +59,14 @@ public class TaskServiceImpl implements TaskService {
 
         try {
             taskRepository.save(task);
+
+            // SEND NOTIFICATION TO USER
+            NotificationRequest notificationRequest = new NotificationRequest();
+            notificationRequest.setTitle("New Task Added");
+            notificationRequest.setBody("A new task has been added with title: " + task.getTitle());
+            notificationRequest.setTopic("Task Notifications");
+            notificationService.sendNotificationToUser(user.getId(), notificationRequest);
+
         } catch (Exception e) {
             throw new IFarmServiceException("An error occurred while saving the task", e);
         }
