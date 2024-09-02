@@ -277,9 +277,10 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void sendNotificationToUser(Long userId, NotificationRequest request) throws ExecutionException, InterruptedException {
-        System.out.println("ADMIN ID FROM SERVICE METHOD" + userId);
+        System.out.println("ADMIN ID FROM SERVICE METHOD " + userId);
         // Retrieve tokens for the specific user using the service method
         List<NotificationToken> tokens = notificationTokenService.getTokensByUserId(userId);
+        System.out.println("FOUND TOKEN FROM SERVICE METHOD " + tokens);
 
 //    NotificationToken token = tokens.get(0);
 //    System.out.println(" FIRST TOKEN " + tokens.get(0).toString());
@@ -291,6 +292,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         // Send notification to each token
         for (NotificationToken token : tokens) {
+            System.out.println("GOT HEREEE " + tokens);
             request.setToken(token.getToken());
             fcmService.sendMessageToToken(request);
 //        System.out.println("notification sent from inside service method");
