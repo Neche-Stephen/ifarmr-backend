@@ -5,8 +5,6 @@ import org.ifarmr.payload.request.NotificationRequest;
 import org.ifarmr.payload.request.RecentActivityDto;
 import org.ifarmr.payload.response.NotificationResponse;
 import org.ifarmr.service.NotificationService;
-import org.ifarmr.service.impl.FCMService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -21,9 +19,6 @@ import java.util.concurrent.ExecutionException;
 @RequestMapping("/api/v1/notifications")
 public class NotificationController {
 
-    @Autowired
-    private FCMService fcmService;
-
     private final NotificationService notificationService;
 
     @GetMapping("/recent-activities")
@@ -33,16 +28,6 @@ public class NotificationController {
 
         List<RecentActivityDto> activities = notificationService.getRecentActivities(username);
         return ResponseEntity.ok(activities);
-    }
-
-    @PostMapping("/notification")
-    public ResponseEntity sendNotification(@RequestBody NotificationRequest request) throws ExecutionException, InterruptedException {
-        fcmService.sendMessageToToken(request);
-        NotificationResponse response = NotificationResponse.builder()
-                .status(HttpStatus.OK.value())
-                .message("Notification has been sent.")
-                .build();
-        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/send-to-user/")

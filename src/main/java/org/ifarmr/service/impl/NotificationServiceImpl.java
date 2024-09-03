@@ -9,6 +9,8 @@ import org.ifarmr.payload.request.RecentActivityDto;
 import org.ifarmr.repository.*;
 import org.ifarmr.service.NotificationService;
 import org.ifarmr.service.NotificationTokenService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,7 @@ import java.util.concurrent.ExecutionException;
 @Service
 public class NotificationServiceImpl implements NotificationService {
 
+    private static final Logger logger = LoggerFactory.getLogger(NotificationServiceImpl.class);
 
     @Autowired
     private NotificationTokenRepository tokenRepository;
@@ -97,15 +100,15 @@ public class NotificationServiceImpl implements NotificationService {
 
     private List<RecentActivityDto> getCommentActivities(User user) {
         List<RecentActivityDto> activities = new ArrayList<>();
-        List<Comment> comments = commentRepository.findByUserIdOrderByDateCreatedDesc(user.getId());
+        List<Comment> comments = commentRepository.findCommentsOnUserPosts(user.getId());
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy");
 
         for (Comment comment : comments) {
             activities.add(RecentActivityDto.builder()
                     .icon("comment-icon") // Replace with appropriate icon
-                    .title("New Comment")
-                    .description(comment.getContent())
+                    .title("New Comment on Your Post")
+                    .description(comment.getUser().getUsername() + " commented: \"" + comment.getContent() + "\"")
                     .timeAgo(calculateTimeAgo(comment.getDateCreated()))
                     .date(comment.getDateCreated().format(formatter))
                     .build());
@@ -115,21 +118,43 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     private List<RecentActivityDto> getLikeActivities(User user) {
+        logger.info("Fetching like activities for user: {}", user.getUsername());
         List<RecentActivityDto> activities = new ArrayList<>();
-        List<Like> likes = likeRepository.findByUserIdOrderByDateCreatedDesc(user.getId());
+        List<Like> likes = likeRepository.findLikesOnUserContent(user.getId());
+
+        if (likes.isEmpty()) {
+            logger.warn("No likes found for user: {}", user.getUsername());
+        }
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy");
 
         for (Like like : likes) {
+            String title;
+            String description;
+
+            if (like.getPost() != null) {
+                title = "Your Post Received a Like";
+                description = like.getUser().getUsername() + " liked your post: \"" + like.getPost().getTitle() + "\"";
+                logger.info("Like found on post: {} by user: {}", like.getPost().getTitle(), like.getUser().getUsername());
+            } else if (like.getComment() != null) {
+                title = "Your Comment Received a Like";
+                description = like.getUser().getUsername() + " liked your comment: \"" + like.getComment().getContent() + "\"";
+                logger.info("Like found on comment: {} by user: {}", like.getComment().getContent(), like.getUser().getUsername());
+            } else {
+                logger.error("Like found with no associated post or comment for user: {}", user.getUsername());
+                continue; // Skip if neither post nor comment is associated
+            }
+
             activities.add(RecentActivityDto.builder()
                     .icon("like-icon") // Replace with appropriate icon
-                    .title("New Like")
-                    .description("Liked a post/comment")
+                    .title(title)
+                    .description(description)
                     .timeAgo(calculateTimeAgo(like.getDateCreated()))
                     .date(like.getDateCreated().format(formatter))
                     .build());
         }
 
+        logger.info("Completed fetching like activities for user: {}", user.getUsername());
         return activities;
     }
 
