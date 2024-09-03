@@ -75,7 +75,7 @@ public class InventoryServiceImpl implements InventoryService {
             notificationRequest.setTitle("New Inventory Added");
             notificationRequest.setBody("A new inventory has been created with name: " + inventoryRequest.getName());
             notificationRequest.setTopic("Inventory Notifications");
-            notificationService.sendNotificationToUser(user.getId(), notificationRequest);
+            notificationService.sendNotificationToUser(username, notificationRequest);
 
         }catch (Exception e){
             throw new FunctionErrorException("Unable to save your inventory");

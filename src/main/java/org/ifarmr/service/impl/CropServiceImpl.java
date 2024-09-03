@@ -73,7 +73,7 @@ public class CropServiceImpl implements CropService {
             notificationRequest.setTitle("New Crop Added");
             notificationRequest.setBody("A new crop has been created with name: " + crop.getCropName());
             notificationRequest.setTopic("Crop Notifications");
-            notificationService.sendNotificationToUser(user.getId(), notificationRequest);
+            notificationService.sendNotificationToUser(username, notificationRequest);
 
             return CropResponse.builder()
                     .responseMessage("Crop added successfully!")

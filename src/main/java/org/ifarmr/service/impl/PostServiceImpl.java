@@ -81,7 +81,7 @@ public class PostServiceImpl implements PostService {
         notificationRequest.setTopic("Post Notifications");
 
         try {
-            notificationService.sendNotificationToAll(notificationRequest);
+            notificationService.sendNotificationToAll(userName,notificationRequest);
         } catch (ExecutionException | InterruptedException e) {
             // Handle exceptions
             Thread.currentThread().interrupt(); // Restore interrupted state
@@ -117,7 +117,7 @@ public class PostServiceImpl implements PostService {
             notificationRequest.setTopic("Like Notifications");
 
             try {
-                notificationService.sendNotificationToUser(user.getId(), notificationRequest);
+                notificationService.sendNotificationToUser(username, notificationRequest);
             } catch (ExecutionException | InterruptedException e) {
                 // Handle exceptions
                 Thread.currentThread().interrupt(); // Restore interrupted state
@@ -163,7 +163,7 @@ public class PostServiceImpl implements PostService {
         notificationRequest.setTopic("Comment Notifications");
 
         try {
-            notificationService.sendNotificationToUser(user.getId(), notificationRequest);
+            notificationService.sendNotificationToUser(username, notificationRequest);
         } catch (ExecutionException | InterruptedException e) {
             // Handle exceptions
             Thread.currentThread().interrupt(); // Restore interrupted state

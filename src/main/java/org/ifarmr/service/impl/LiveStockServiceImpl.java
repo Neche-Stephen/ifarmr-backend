@@ -82,7 +82,7 @@ public class LiveStockServiceImpl implements LiveStockService {
             notificationRequest.setTitle("New Livestock Added");
             notificationRequest.setBody("A new Livestock has been added with name: " + liveStockRequest.getAnimalName());
             notificationRequest.setTopic("Livestock Notifications");
-            notificationService.sendNotificationToUser(user.getId(), notificationRequest);
+            notificationService.sendNotificationToUser(username, notificationRequest);
 
             // Build and return the response
             return LiveStockResponse.builder()

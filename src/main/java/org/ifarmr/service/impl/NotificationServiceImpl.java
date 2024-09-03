@@ -265,37 +265,30 @@ public class NotificationServiceImpl implements NotificationService {
     // FIREBASE NOTIFICATION METHODS BELOW;
 
     @Override
-    public void sendNotificationToAll(NotificationRequest request) throws ExecutionException, InterruptedException {
-        List<NotificationToken> tokens = tokenRepository.findAll();
+    public void sendNotificationToUser(String username, NotificationRequest request) throws ExecutionException, InterruptedException {
+        User user = findUserByUsername(username);
+        List<NotificationToken> tokens = notificationTokenService.getTokensByUserId(user.getId());
+
+        if (tokens.isEmpty()) {
+            throw new RuntimeException("No tokens found for user with ID: " + user.getId());
+        }
+
         for (NotificationToken token : tokens) {
             request.setToken(token.getToken());
             fcmService.sendMessageToToken(request);
         }
     }
-
-
 
     @Override
-    public void sendNotificationToUser(Long userId, NotificationRequest request) throws ExecutionException, InterruptedException {
-        System.out.println("ADMIN ID FROM SERVICE METHOD " + userId);
-        // Retrieve tokens for the specific user using the service method
-        List<NotificationToken> tokens = notificationTokenService.getTokensByUserId(userId);
-        System.out.println("FOUND TOKEN FROM SERVICE METHOD " + tokens);
+    public void sendNotificationToAll(String username, NotificationRequest request) throws ExecutionException, InterruptedException {
+        // No need to validate the username if this is for all users,
+        // but you might want to log or audit who initiated the action.
+        List<NotificationToken> tokens = tokenRepository.findAll();
 
-//    NotificationToken token = tokens.get(0);
-//    System.out.println(" FIRST TOKEN " + tokens.get(0).toString());
-
-        // Check if tokens are found
-        if (tokens.isEmpty()) {
-            throw new RuntimeException("No tokens found for user with ID: " + userId);
-        }
-
-        // Send notification to each token
         for (NotificationToken token : tokens) {
-            System.out.println("GOT HEREEE " + tokens);
             request.setToken(token.getToken());
             fcmService.sendMessageToToken(request);
-//        System.out.println("notification sent from inside service method");
         }
     }
+
 }

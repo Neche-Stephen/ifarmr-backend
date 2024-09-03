@@ -20,6 +20,7 @@ import java.util.concurrent.ExecutionException;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/notifications")
 public class NotificationController {
+
     @Autowired
     private FCMService fcmService;
 
@@ -44,12 +45,14 @@ public class NotificationController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/token/send-to-user/{userId}")
+    @PostMapping("/send-to-user/")
     public ResponseEntity<NotificationResponse> sendNotificationToUser(
-            @PathVariable Long userId,
             @RequestBody NotificationRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
         try {
-            notificationService.sendNotificationToUser(userId, request);
+            notificationService.sendNotificationToUser(username, request);
             NotificationResponse response = NotificationResponse.builder()
                     .status(HttpStatus.OK.value())
                     .message("Notification sent to user.")
@@ -65,10 +68,13 @@ public class NotificationController {
         }
     }
 
-    @PostMapping("token/send-to-all")
+    @PostMapping("/send-to-all")
     public ResponseEntity<NotificationResponse> sendNotificationToAll(@RequestBody NotificationRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
         try {
-            notificationService.sendNotificationToAll(request);
+            notificationService.sendNotificationToAll(username, request);
             NotificationResponse response = NotificationResponse.builder()
                     .status(HttpStatus.OK.value())
                     .message("Notification sent to all tokens.")
@@ -83,7 +89,4 @@ public class NotificationController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
-
 }

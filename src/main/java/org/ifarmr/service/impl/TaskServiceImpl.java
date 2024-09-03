@@ -65,7 +65,7 @@ public class TaskServiceImpl implements TaskService {
             notificationRequest.setTitle("New Task Added");
             notificationRequest.setBody("A new task has been added with title: " + task.getTitle());
             notificationRequest.setTopic("Task Notifications");
-            notificationService.sendNotificationToUser(user.getId(), notificationRequest);
+            notificationService.sendNotificationToUser(currentUsername, notificationRequest);
 
         } catch (Exception e) {
             throw new IFarmServiceException("An error occurred while saving the task", e);

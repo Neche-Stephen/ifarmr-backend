@@ -1,6 +1,9 @@
 package org.ifarmr.config;
 
 import lombok.RequiredArgsConstructor;
+import org.ifarmr.controller.NotificationTokenController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,13 +26,15 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@EnableMethodSecurity(prePostEnabled = true)  // Enable method-level security
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity security) throws Exception {
@@ -38,24 +43,23 @@ public class SecurityConfig {
         security.csrf(CsrfConfigurer::disable)
                 .authorizeHttpRequests(
                         requests -> requests
-                                // Public endpoints
                                 .requestMatchers(
                                         antMatcher(HttpMethod.POST, "/api/v1/auth/**"),
+                                        antMatcher(HttpMethod.POST, "/token/**"),
                                         antMatcher(HttpMethod.GET, "/api/v1/auth/**"),
                                         antMatcher(HttpMethod.GET, "/swagger-ui.html"),
                                         antMatcher(HttpMethod.GET, "/swagger-ui/**"),
                                         antMatcher(HttpMethod.GET, "/v3/api-docs/**"),
                                         antMatcher(HttpMethod.GET, "/swagger-resources/**")
                                 ).permitAll()
-                                // Role-based access control to the secured endpoints
-                                .requestMatchers("/api/v1/admin/**").hasAuthority("ADMIN") // Admin-specific endpoints
-                                .requestMatchers("/api/v1/user/**").hasAuthority("USER") // // User-specific endpoints
+                                .requestMatchers("/api/v1/admin/**").hasAuthority("ADMIN")
+                                .requestMatchers("/api/v1/user/**").hasAuthority("USER")
                                 .requestMatchers("/api/v1/posts/**").hasAuthority("USER")
                                 .requestMatchers("/api/v1/tasks/**").hasAuthority("USER")
                                 .requestMatchers("/api/v1/crops/**").hasAuthority("USER")
                                 .requestMatchers("/api/v1/inventory/**").hasAuthority("USER")
                                 .requestMatchers("/api/v1/livestock/**").hasAuthority("USER")
-
+                                .requestMatchers("/api/v1/notifications/**").hasAuthority("USER")
                                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
@@ -68,18 +72,24 @@ public class SecurityConfig {
                         .failureHandler(customAuthenticationFailureHandler))
                 .cors(customizer -> customizer.configurationSource(corsConfigurationSource()));
 
+        // Add logging for debugging
+        security.addFilterBefore((request, response, chain) -> {
+            logger.info("Security configuration applied");
+            chain.doFilter(request, response);
+        }, UsernamePasswordAuthenticationFilter.class);
+
         return security.build();
     }
 
     @Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*")); // Set your allowed origins here
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE")); // Set your allowed HTTP methods
-        configuration.setAllowedHeaders(Arrays.asList("*")); // Set your allowed headers (e.g., Content-Type, Authorization)
+        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); // Apply CORS configuration to all paths
+        source.registerCorsConfiguration("/**", configuration);
 
         return source;
     }

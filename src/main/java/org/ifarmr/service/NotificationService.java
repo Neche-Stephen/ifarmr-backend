@@ -10,8 +10,8 @@ public interface NotificationService {
 
     List<RecentActivityDto> getRecentActivities(String username);
 
-    void sendNotificationToUser(Long userId, NotificationRequest request) throws ExecutionException, InterruptedException;
+    void sendNotificationToUser(String username, NotificationRequest request) throws ExecutionException, InterruptedException;
 
-    void sendNotificationToAll(NotificationRequest request) throws ExecutionException, InterruptedException;
+    void sendNotificationToAll(String username, NotificationRequest request) throws ExecutionException, InterruptedException;
 
 }
