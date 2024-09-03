@@ -1,26 +1,14 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyBbJRnC9NOpFpLNL3bcLoW7hbgLKUMBp_g",
-  authDomain: "ifarm-17b22.firebaseapp.com",
-  projectId: "ifarm-17b22",
-  storageBucket: "ifarm-17b22.appspot.com",
-  messagingSenderId: "353197689782",
-  appId: "1:353197689782:web:9a3e38679bbeeb24b34f17",
-  measurementId: "G-5GTV3Y0LZZ"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+CropRepository.java
 
 
 
+LiveStockRepository.java
 
-KeyPair:  BCsu4P65QnO2pqGFDKdMMHnw5FeOAsgMcBQIkSbB-S-BTaDuvMQWsKhiPgUlrkDAJjhRYAfpj3mf7lw896zz_Eg
+
+CropServiceImpl.java
+
+
+LiveStockServiceImpl.java
+
+
+PostServiceImpl.java

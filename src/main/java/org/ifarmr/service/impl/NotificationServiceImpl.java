@@ -118,7 +118,6 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     private List<RecentActivityDto> getLikeActivities(User user) {
-        logger.info("Fetching like activities for user: {}", user.getUsername());
         List<RecentActivityDto> activities = new ArrayList<>();
         List<Like> likes = likeRepository.findLikesOnUserContent(user.getId());
 
@@ -135,13 +134,10 @@ public class NotificationServiceImpl implements NotificationService {
             if (like.getPost() != null) {
                 title = "Your Post Received a Like";
                 description = like.getUser().getUsername() + " liked your post: \"" + like.getPost().getTitle() + "\"";
-                logger.info("Like found on post: {} by user: {}", like.getPost().getTitle(), like.getUser().getUsername());
             } else if (like.getComment() != null) {
                 title = "Your Comment Received a Like";
                 description = like.getUser().getUsername() + " liked your comment: \"" + like.getComment().getContent() + "\"";
-                logger.info("Like found on comment: {} by user: {}", like.getComment().getContent(), like.getUser().getUsername());
             } else {
-                logger.error("Like found with no associated post or comment for user: {}", user.getUsername());
                 continue; // Skip if neither post nor comment is associated
             }
 
@@ -154,7 +150,6 @@ public class NotificationServiceImpl implements NotificationService {
                     .build());
         }
 
-        logger.info("Completed fetching like activities for user: {}", user.getUsername());
         return activities;
     }
 
