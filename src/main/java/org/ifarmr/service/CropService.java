@@ -13,5 +13,7 @@ public interface CropService {
     List<CropResponse> getAllCropsByUser(String username);
 
     List<CropSummaryResponse> getCropSummaryByUser(String username);
+
+    int totalCrop(String username);
 }
  

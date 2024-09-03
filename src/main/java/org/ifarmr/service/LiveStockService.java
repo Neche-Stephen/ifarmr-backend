@@ -13,4 +13,6 @@ public interface LiveStockService {
     List<LiveStockResponse> getAllLiveStockByUser(String username);
 
     List<LivestockSummaryResponse> getLivestockSummaryByUser(String username);
+
+    int totalLiveStock(String username);
 }

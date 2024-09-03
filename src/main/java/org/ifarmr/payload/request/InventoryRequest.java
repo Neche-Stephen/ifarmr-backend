@@ -1,5 +1,6 @@
 package org.ifarmr.payload.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -35,6 +36,7 @@ public class InventoryRequest {
     private String location;
 
     @NotBlank(message = "Date acquired is required")
+    @Schema(description = "The date format example = \"2024-12-12")
     private LocalDate dateAcquired;
 
     @NotBlank(message = "Current state is required")

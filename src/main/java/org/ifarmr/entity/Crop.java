@@ -8,7 +8,7 @@ import lombok.*;
 import org.ifarmr.enums.CropType;
 import org.ifarmr.enums.Status;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -25,9 +25,9 @@ public class Crop extends BaseClass {
     @NotNull
     private CropType cropType;
 
-    private LocalDateTime sowDate;
+    private LocalDate sowDate;
 
-    private LocalDateTime harvestDate;
+    private LocalDate harvestDate;
 
     private String numberOfSeedlings;
 

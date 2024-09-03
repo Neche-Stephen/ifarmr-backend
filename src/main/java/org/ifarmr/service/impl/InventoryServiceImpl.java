@@ -51,7 +51,7 @@ public class InventoryServiceImpl implements InventoryService {
                 Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
                 fileUrl = uploadResult.get("url").toString();
             } catch (Exception e) {
-                throw new FileUploadException("Failed to Upload your file");
+                throw new FileUploadException("Failed to Upload your file " + e.getMessage());
             }
         }
 

@@ -14,6 +14,7 @@ import org.ifarmr.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,14 +35,14 @@ public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    @PutMapping("/upload/profilephoto")
+    @PutMapping(value="/upload/profilephoto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CloudinaryResponse> profilePicture (@RequestParam("file") MultipartFile file){
         String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
 
         return ResponseEntity.ok(fileUploadService.uploadProfilePicture(username, file));
     }
 
-    @PutMapping("/edit-user-details")
+    @PutMapping(value="/edit-user-details",consumes = MediaType.MULTIPART_FORM_DATA_VALUE )
     public ResponseEntity<UserDetailsDto> editUserDetails(
             @RequestParam(value = "file", required = false) MultipartFile file,
             @RequestParam(value = "fullName", required = false) String fullName,

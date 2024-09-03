@@ -9,7 +9,7 @@ import org.ifarmr.enums.CropType;
 import org.ifarmr.enums.Status;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -27,8 +27,8 @@ public class CropRequest {
 
     @NotNull(message = "Harvest Date is required")
     @FutureOrPresent(message = "Harvest date must be today or in the future")
-    @Schema(description = "The harvest date and time example = \"2024-12-12T10:00:00")
-    private LocalDateTime harvestDate;
+    @Schema(description = "The harvest date and time example = \"2024-12-12")
+    private LocalDate harvestDate;
 
     @NotNull(message = "Number of Seedlings is required")
     private String numberOfSeedlings;
@@ -60,6 +60,6 @@ public class CropRequest {
 
     @NotNull(message = "Sow date is required")
     @FutureOrPresent(message = "Sow date must be today or in the future")
-    @Schema(description = "The sow date and time, example = \"2024-08-28T14:30:30")
-    private LocalDateTime sowDate;
+    @Schema(description = "The sow date and time, example = \"2024-08-28")
+    private LocalDate sowDate;
 }

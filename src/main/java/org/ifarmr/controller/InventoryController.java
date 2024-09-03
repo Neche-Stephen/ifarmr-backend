@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.ifarmr.payload.request.InventoryRequest;
 import org.ifarmr.payload.response.InventoryResponse;
 import org.ifarmr.service.InventoryService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +17,7 @@ public class InventoryController {
 
     private final InventoryService inventoryService;
 
-    @PostMapping("/create")
+    @PostMapping(value ="/create" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<InventoryResponse> createInventory (@ModelAttribute InventoryRequest inventoryRequest) {
         String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
         return ResponseEntity.ok(inventoryService.createInventory(inventoryRequest, username));

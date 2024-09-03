@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -53,5 +54,10 @@ public class LiveStockController {
 
     }
 
+    @GetMapping("/total")
+    public ResponseEntity<Integer> getTotalCrops() {
+        String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        return ResponseEntity.ok(liveStockService.totalLiveStock(username));
+    }
 
 }

@@ -5,7 +5,6 @@ import org.ifarmr.entity.Crop;
 import org.ifarmr.entity.User;
 import org.ifarmr.exceptions.*;
 import org.ifarmr.payload.request.CropRequest;
-import org.ifarmr.payload.request.NotificationRequest;
 import org.ifarmr.payload.response.CropInfo;
 import org.ifarmr.payload.response.CropResponse;
 import org.ifarmr.payload.response.CropSummaryInfo;
@@ -14,7 +13,7 @@ import org.ifarmr.repository.CropRepository;
 import org.ifarmr.repository.UserRepository;
 import org.ifarmr.service.CropService;
 import org.ifarmr.service.GlobalUploadService;
-import org.ifarmr.service.NotificationService;
+import org.ifarmr.utils.FileUploadUtil;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +28,6 @@ public class CropServiceImpl implements CropService {
     private final CropRepository cropRepository;
     private final UserRepository userRepository;
     private final GlobalUploadService globalUploadService;
-    private final NotificationService notificationService;
 
     @Override
     public CropResponse addCrop(CropRequest cropRequest, String username) {
@@ -45,6 +43,7 @@ public class CropServiceImpl implements CropService {
             // Handle photo upload
             String uploadedPhotoUrl = null;
             if (cropRequest.getPhotoUpload() != null && !cropRequest.getPhotoUpload().isEmpty()) {
+                FileUploadUtil.assertAllowed(cropRequest.getPhotoUpload(), FileUploadUtil.IMAGE_PATTERN);
                 uploadedPhotoUrl = globalUploadService.uploadImage(cropRequest.getPhotoUpload());
             }
 
@@ -67,13 +66,6 @@ public class CropServiceImpl implements CropService {
                     .build();
 
             Crop savedCrop = cropRepository.save(crop);
-
-            // SEND NOTIFICATION TO USER
-            NotificationRequest notificationRequest = new NotificationRequest();
-            notificationRequest.setTitle("New Crop Added");
-            notificationRequest.setBody("A new crop has been created with name: " + crop.getCropName());
-            notificationRequest.setTopic("Crop Notifications");
-            notificationService.sendNotificationToUser(username, notificationRequest);
 
             return CropResponse.builder()
                     .responseMessage("Crop added successfully!")
@@ -147,6 +139,13 @@ public class CropServiceImpl implements CropService {
                         .build())
                 .collect(Collectors.toList());
 
+    }
+    @Override
+    public int totalCrop(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("User with " + username +" not found"));
+
+        return cropRepository.countByUser(user);
     }
 }
 
