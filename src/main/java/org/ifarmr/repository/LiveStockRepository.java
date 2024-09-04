@@ -16,4 +16,6 @@ public interface LiveStockRepository extends JpaRepository<LiveStock, Long> {
 
     int countByUser(User user);
 
+    List<LiveStock> findByUserIdOrderByDateCreatedDesc(Long userId);
+
 }

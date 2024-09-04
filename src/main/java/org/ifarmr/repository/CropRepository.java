@@ -15,4 +15,6 @@ public interface CropRepository extends JpaRepository<Crop, Long> {
 
     int countByUser(User user);
 
+    List<Crop> findByUserIdOrderBySowDateDesc(Long userId);
+
 }

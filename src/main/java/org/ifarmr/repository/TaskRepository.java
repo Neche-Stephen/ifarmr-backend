@@ -14,4 +14,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     @Query("SELECT t FROM Task t WHERE t.user = :user ORDER BY t.dueDate ASC")
     List<Task> findTasksByUserOrderByDueDateAsc(@Param("user") User user);
+
+    List<Task> findByUserIdOrderByDueDateDesc(Long userId);
 }

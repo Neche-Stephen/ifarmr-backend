@@ -13,4 +13,6 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
     int countByUser(User user);
 
+    List<Inventory> findByUserIdOrderByDateAcquiredDesc(Long userId);
+
 }

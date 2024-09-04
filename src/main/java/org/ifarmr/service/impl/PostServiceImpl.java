@@ -10,6 +10,7 @@ import org.ifarmr.entity.User;
 import org.ifarmr.exceptions.FileUploadException;
 import org.ifarmr.exceptions.NotFoundException;
 import org.ifarmr.payload.request.CommentDto;
+import org.ifarmr.payload.request.NotificationRequest;
 import org.ifarmr.payload.request.PostRequest;
 import org.ifarmr.payload.response.PopularPostResponse;
 import org.ifarmr.payload.response.PostResponse;
@@ -18,11 +19,13 @@ import org.ifarmr.repository.CommentRepository;
 import org.ifarmr.repository.LikeRepository;
 import org.ifarmr.repository.PostRepository;
 import org.ifarmr.repository.UserRepository;
+import org.ifarmr.service.NotificationService;
 import org.ifarmr.service.PostService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -35,6 +38,8 @@ public class PostServiceImpl implements PostService {
 
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
+
+    private final NotificationService notificationService;
 
     @Override
     public PostResponse createPost(PostRequest postRequest, String userName) {
@@ -66,6 +71,20 @@ public class PostServiceImpl implements PostService {
                 .build()
         );
 
+        // SEND NOTIFICATION TO ALL USERS
+        NotificationRequest notificationRequest = new NotificationRequest();
+        notificationRequest.setTitle("New Post Added");
+        notificationRequest.setBody("A new post has been added with title: " + post.getTitle());
+        notificationRequest.setTopic("Post Notifications");
+
+        try {
+            notificationService.sendNotificationToAll(userName,notificationRequest);
+        } catch (ExecutionException | InterruptedException e) {
+            // Handle exceptions
+            Thread.currentThread().interrupt(); // Restore interrupted state
+            throw new RuntimeException("Failed to send notification to all users", e);
+        }
+
         return PostResponse.builder()
                 .message("Post created successfully")
                 .title(postRequest.getTitle())
@@ -93,6 +112,18 @@ public class PostServiceImpl implements PostService {
             like.setPost(post);
             like.setUser(user);
             likeRepository.save(like);
+
+            NotificationRequest notificationRequest = new NotificationRequest();
+            notificationRequest.setTitle("New Like");
+            notificationRequest.setBody("A post/comment has been liked with title: " + post.getTitle());
+            notificationRequest.setTopic("Like Notifications");
+
+            try {
+                notificationService.sendNotificationToUser(username, notificationRequest);
+            } catch (ExecutionException | InterruptedException e) {
+                Thread.currentThread().interrupt(); // Restore interrupted state
+                throw new RuntimeException("Failed to send notification to the user", e);
+            }
             return "Post liked successfully.";
         }
     }
@@ -112,6 +143,19 @@ public class PostServiceImpl implements PostService {
         comment.setUser(user);
 
         Comment savedComment = commentRepository.save(comment);
+
+        // SEND NOTIFICATION TO USER
+        NotificationRequest notificationRequest = new NotificationRequest();
+        notificationRequest.setTitle("New Comment Added");
+        notificationRequest.setBody("A new comment has been added with title: " + post.getTitle());
+        notificationRequest.setTopic("Comment Notifications");
+
+        try {
+            notificationService.sendNotificationToUser(username, notificationRequest);
+        } catch (ExecutionException | InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Failed to send notification to the user", e);
+        }
 
         // Return the saved comment details as CommentDto
         CommentDto savedCommentDto = new CommentDto();
