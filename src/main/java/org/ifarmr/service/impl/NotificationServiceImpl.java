@@ -106,9 +106,9 @@ public class NotificationServiceImpl implements NotificationService {
 
         for (Comment comment : comments) {
             activities.add(RecentActivityDto.builder()
-                    .icon("comment-icon") // Replace with appropriate icon
+                    .icon("comment-icon")
                     .title("New Comment on Your Post")
-                    .description(comment.getUser().getUsername() + " commented: \"" + comment.getContent() + "\"")
+                    .description(comment.getUser().getFullName() + " commented: \"" + comment.getContent() + "\"")
                     .timeAgo(calculateTimeAgo(comment.getDateCreated()))
                     .date(comment.getDateCreated().format(formatter))
                     .build());
@@ -121,10 +121,6 @@ public class NotificationServiceImpl implements NotificationService {
         List<RecentActivityDto> activities = new ArrayList<>();
         List<Like> likes = likeRepository.findLikesOnUserContent(user.getId());
 
-        if (likes.isEmpty()) {
-            logger.warn("No likes found for user: {}", user.getUsername());
-        }
-
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy");
 
         for (Like like : likes) {
@@ -133,16 +129,16 @@ public class NotificationServiceImpl implements NotificationService {
 
             if (like.getPost() != null) {
                 title = "Your Post Received a Like";
-                description = like.getUser().getUsername() + " liked your post: \"" + like.getPost().getTitle() + "\"";
+                description = like.getUser().getFullName() + " liked your post: \"" + like.getPost().getTitle() + "\"";
             } else if (like.getComment() != null) {
                 title = "Your Comment Received a Like";
-                description = like.getUser().getUsername() + " liked your comment: \"" + like.getComment().getContent() + "\"";
+                description = like.getUser().getFullName() + " liked your comment: \"" + like.getComment().getContent() + "\"";
             } else {
                 continue; // Skip if neither post nor comment is associated
             }
 
             activities.add(RecentActivityDto.builder()
-                    .icon("like-icon") // Replace with appropriate icon
+                    .icon("like-icon")
                     .title(title)
                     .description(description)
                     .timeAgo(calculateTimeAgo(like.getDateCreated()))

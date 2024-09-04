@@ -113,16 +113,20 @@ public class PostServiceImpl implements PostService {
             like.setUser(user);
             likeRepository.save(like);
 
+            // Get the owner of the post
+            User postOwner = post.getUser();
+
+            // Send notification to the owner of the post
             NotificationRequest notificationRequest = new NotificationRequest();
-            notificationRequest.setTitle("New Like");
-            notificationRequest.setBody("A post/comment has been liked with title: " + post.getTitle());
+            notificationRequest.setTitle(generateLikeNotificationTitle(like));
+            notificationRequest.setBody(generateLikeNotificationDescription(like));
             notificationRequest.setTopic("Like Notifications");
 
             try {
-                notificationService.sendNotificationToUser(username, notificationRequest);
+                notificationService.sendNotificationToUser(postOwner.getUsername(), notificationRequest);
             } catch (ExecutionException | InterruptedException e) {
-                Thread.currentThread().interrupt(); // Restore interrupted state
-                throw new RuntimeException("Failed to send notification to the user", e);
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("Failed to send notification to the post owner", e);
             }
             return "Post liked successfully.";
         }
@@ -144,24 +148,27 @@ public class PostServiceImpl implements PostService {
 
         Comment savedComment = commentRepository.save(comment);
 
-        // SEND NOTIFICATION TO USER
+        // Get the owner of the post or comment
+        User postOwner = post.getUser();
+
+        // Send notification to the owner of the post
         NotificationRequest notificationRequest = new NotificationRequest();
-        notificationRequest.setTitle("New Comment Added");
-        notificationRequest.setBody("A new comment has been added with title: " + post.getTitle());
+        notificationRequest.setTitle(generateCommentNotificationTitle(savedComment));
+        notificationRequest.setBody(generateCommentNotificationDescription(savedComment));
         notificationRequest.setTopic("Comment Notifications");
 
         try {
-            notificationService.sendNotificationToUser(username, notificationRequest);
+            notificationService.sendNotificationToUser(postOwner.getUsername(), notificationRequest);
         } catch (ExecutionException | InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException("Failed to send notification to the user", e);
+            throw new RuntimeException("Failed to send notification to the post owner", e);
         }
 
         // Return the saved comment details as CommentDto
         CommentDto savedCommentDto = new CommentDto();
         savedCommentDto.setContent(savedComment.getContent());
         savedCommentDto.setParentContentId(savedComment.getParentContentId());
-        savedCommentDto.setPostId(post.getId());  // Ensure that postId is part of CommentDto
+        savedCommentDto.setPostId(post.getId());
 
         return savedCommentDto;
     }
@@ -182,6 +189,29 @@ public class PostServiceImpl implements PostService {
                         .build())
                 .collect(Collectors.toList());
     }
+    private String generateLikeNotificationTitle(Like like) {
+        if (like.getPost() != null) {
+            return "Your Post Received a Like";
+        } else if (like.getComment() != null) {
+            return "Your Comment Received a Like";
+        }
+        return "Content Received a Like";
+    }
+    private String generateLikeNotificationDescription(Like like) {
+        if (like.getPost() != null) {
+            return like.getUser().getUsername() + " liked your post: \"" + like.getPost().getTitle() + "\"";
+        } else if (like.getComment() != null) {
+            return like.getUser().getUsername() + " liked your comment: \"" + like.getComment().getContent() + "\"";
+        }
+        return "A user liked your content";
+    }
+    private String generateCommentNotificationTitle(Comment comment) {
+        return "New Comment on Your Post";
+    }
+    private String generateCommentNotificationDescription(Comment comment) {
+        return comment.getUser().getUsername() + " commented: \"" + comment.getContent() + "\"";
+    }
+
 
     public List<PopularPostResponse> getPopularPosts() {
         List<Post> posts = postRepository.findAll();
