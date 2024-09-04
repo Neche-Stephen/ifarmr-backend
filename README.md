@@ -54,3 +54,53 @@ To set up the development environment for Ifarmer, follow these steps:
    ```bash
    git clone https://github.com/yourusername/ifarmer.git
    cd ifarmer
+
+2. **Set Up Environment Variables:**
+
+   Configure the required environment variables such as database credentials, Firebase configuration, and other application-specific settings.
+
+
+3. **Install Dependencies:**
+
+   Ensure you have Java 17 and Maven installed. Then, install the required dependencies:
+   ```bash
+   mvn clean install
+
+4. **Set Up the Database:**
+
+   Configure your database (e.g., MySQL) and update the **application.properties** file with the correct database settings.
+
+
+5. **Run the Application:**
+
+   ```bash
+   mvn spring-boot:run
+
+## Build And Run
+
+To build the Ifarmer project, use the following command:
+
+   ```bash
+   mvn clean package
+   ```
+
+This will create a jar file in the target directory that can be run using:
+
+   ```bash
+   java -jar target/ifarmer-0.0.1-SNAPSHOT.jar
+   ```
+
+## Contributing
+
+If you'd like to contribute to Ifarmer, please follow these guidelines:
+
+1. Fork the repository and create your feature branch (git checkout -b feature/YourFeature).
+2. Commit your changes (git commit -am 'Add some feature').
+3. Push to the branch (git push origin feature/YourFeature).
+4. Create a new Pull Request.
+
+
+## License
+
+Ifarmer is open-source software licensed under the MIT license. See the LICENSE file for more information.
+

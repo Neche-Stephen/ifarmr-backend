@@ -106,7 +106,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         for (Comment comment : comments) {
             activities.add(RecentActivityDto.builder()
-                    .icon("comment-icon") // Replace with appropriate icon
+                    .icon("comment-icon")
                     .title("New Comment on Your Post")
                     .description(comment.getUser().getFullName() + " commented: \"" + comment.getContent() + "\"")
                     .timeAgo(calculateTimeAgo(comment.getDateCreated()))
@@ -120,10 +120,6 @@ public class NotificationServiceImpl implements NotificationService {
     private List<RecentActivityDto> getLikeActivities(User user) {
         List<RecentActivityDto> activities = new ArrayList<>();
         List<Like> likes = likeRepository.findLikesOnUserContent(user.getId());
-
-        if (likes.isEmpty()) {
-            logger.warn("No likes found for user: {}", user.getUsername());
-        }
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy");
 
@@ -142,7 +138,7 @@ public class NotificationServiceImpl implements NotificationService {
             }
 
             activities.add(RecentActivityDto.builder()
-                    .icon("like-icon") // Replace with appropriate icon
+                    .icon("like-icon")
                     .title(title)
                     .description(description)
                     .timeAgo(calculateTimeAgo(like.getDateCreated()))
