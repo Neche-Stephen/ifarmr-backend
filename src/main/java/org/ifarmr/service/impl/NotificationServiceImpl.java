@@ -160,12 +160,13 @@ public class NotificationServiceImpl implements NotificationService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy");
 
         for (Task task : tasks) {
+            LocalDateTime dueDateTime = task.getDueDate().atStartOfDay(); // Convert LocalDate to LocalDateTime
             activities.add(RecentActivityDto.builder()
                     .icon("task-icon") // Replace with appropriate icon
                     .title("New Task")
                     .description(task.getTitle())
-                    .timeAgo(calculateTimeAgo(task.getDueDate().atStartOfDay()))
-                    .date(task.getDueDate().atStartOfDay().format(formatter))
+                    .timeAgo(calculateTimeAgo(dueDateTime))
+                    .date(dueDateTime.format(formatter))
                     .build());
         }
 
@@ -179,12 +180,13 @@ public class NotificationServiceImpl implements NotificationService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy");
 
         for (Crop crop : crops) {
+            LocalDateTime sowDateTime = crop.getSowDate().atStartOfDay(); // Convert LocalDate to LocalDateTime
             activities.add(RecentActivityDto.builder()
                     .icon("crop-icon") // Replace with appropriate icon
                     .title("New Crop")
                     .description(crop.getCropName())
-                    .timeAgo(calculateTimeAgo(crop.getSowDate()))
-                    .date(crop.getSowDate().format(formatter))
+                    .timeAgo(calculateTimeAgo(sowDateTime))
+                    .date(sowDateTime.format(formatter))
                     .build());
         }
 
@@ -198,12 +200,13 @@ public class NotificationServiceImpl implements NotificationService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy");
 
         for (Inventory inventory : inventories) {
+            LocalDateTime acquiredDateTime = inventory.getDateAcquired().atStartOfDay(); // Convert LocalDate to LocalDateTime
             activities.add(RecentActivityDto.builder()
                     .icon("inventory-icon") // Replace with appropriate icon
                     .title("New Inventory")
                     .description(inventory.getName())
-                    .timeAgo(calculateTimeAgo(inventory.getDateAcquired().atStartOfDay()))
-                    .date(inventory.getDateAcquired().atStartOfDay().format(formatter))
+                    .timeAgo(calculateTimeAgo(acquiredDateTime))
+                    .date(acquiredDateTime.format(formatter))
                     .build());
         }
 

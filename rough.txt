@@ -1,14 +1,604 @@
-CropRepository.java
+// CropRepository.java
+
+package org.ifarmr.repository;
+
+import org.ifarmr.entity.Crop;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface CropRepository extends JpaRepository<Crop, Long> {
+
+    Optional<Crop> findByCropName(String name);
+
+    List<Crop> findByUser_Username(String username);
+
+    List<Crop> findByUserIdOrderBySowDateDesc(Long userId);
+}
+
+
+// LiveStockRepository.java
+
+package org.ifarmr.repository;
+
+import org.ifarmr.entity.Crop;
+import org.ifarmr.entity.LiveStock;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface LiveStockRepository extends JpaRepository<LiveStock, Long> {
+
+    Optional<LiveStock> findByAnimalName(String name);
+
+    List<LiveStock> findByUser_Username(String username);
+
+    List<LiveStock> findByUserIdOrderByDateCreatedDesc(Long userId);
+
+}
+
+
+// CropServiceImpl.java
+
+package org.ifarmr.service.impl;
+
+import lombok.RequiredArgsConstructor;
+import org.ifarmr.entity.Crop;
+import org.ifarmr.entity.User;
+import org.ifarmr.exceptions.*;
+import org.ifarmr.payload.request.CropRequest;
+import org.ifarmr.payload.request.NotificationRequest;
+import org.ifarmr.payload.response.CropInfo;
+import org.ifarmr.payload.response.CropResponse;
+import org.ifarmr.payload.response.CropSummaryInfo;
+import org.ifarmr.payload.response.CropSummaryResponse;
+import org.ifarmr.repository.CropRepository;
+import org.ifarmr.repository.UserRepository;
+import org.ifarmr.service.CropService;
+import org.ifarmr.service.GlobalUploadService;
+import org.ifarmr.service.NotificationService;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class CropServiceImpl implements CropService {
+
+    private final CropRepository cropRepository;
+    private final UserRepository userRepository;
+    private final GlobalUploadService globalUploadService;
+    private final NotificationService notificationService;
+
+    @Override
+    public CropResponse addCrop(CropRequest cropRequest, String username) {
+        try {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("User not found with username: " + username));
+
+        // Validate crop name
+        if (cropRequest.getCropName() == null || cropRequest.getCropName().isEmpty()) {
+            throw new BadRequestException("Crop name cannot be null or empty");
+        }
+
+            // Handle photo upload
+            String uploadedPhotoUrl = null;
+            if (cropRequest.getPhotoUpload() != null && !cropRequest.getPhotoUpload().isEmpty()) {
+                uploadedPhotoUrl = globalUploadService.uploadImage(cropRequest.getPhotoUpload());
+            }
+
+            Crop crop = Crop.builder()
+                    .cropName(cropRequest.getCropName())
+                    .cropType(cropRequest.getCropType())
+                    .sowDate(cropRequest.getSowDate())
+                    .harvestDate(cropRequest.getHarvestDate())
+                    .numberOfSeedlings(cropRequest.getNumberOfSeedlings())
+                    .costOfSeedlings(cropRequest.getCostOfSeedlings())
+                    .wateringFrequency(cropRequest.getWateringFrequency())
+                    .fertilizingFrequency(cropRequest.getFertilizingFrequency())
+                    .pestAndDiseases(cropRequest.getPestAndDiseases())
+                    .photoUpload(uploadedPhotoUrl)
+                    .quantity(cropRequest.getQuantity())
+                    .location(cropRequest.getLocation())
+                    .status(cropRequest.getStatus())
+                    .description(cropRequest.getDescription())
+                    .user(user)
+                    .build();
+
+            Crop savedCrop = cropRepository.save(crop);
+
+            // SEND NOTIFICATION TO USER
+            NotificationRequest notificationRequest = new NotificationRequest();
+            notificationRequest.setTitle("New Crop Added");
+            notificationRequest.setBody("A new crop has been created with name: " + crop.getCropName());
+            notificationRequest.setTopic("Crop Notifications");
+            notificationService.sendNotificationToUser(username, notificationRequest);
+
+            return CropResponse.builder()
+                    .responseMessage("Crop added successfully!")
+                    .cropInfo(CropInfo.builder()
+                            .cropName(savedCrop.getCropName())
+                            .cropType(savedCrop.getCropType())
+                            .sowDate(LocalDate.from(savedCrop.getSowDate()))
+                            .harvestDate(LocalDate.from(savedCrop.getHarvestDate()))
+                            .numberOfSeedlings(savedCrop.getNumberOfSeedlings())
+                            .costOfSeedlings(savedCrop.getCostOfSeedlings())
+                            .wateringFrequency("Every " + savedCrop.getWateringFrequency() + " days")
+                            .fertilizingFrequency("Every " + savedCrop.getFertilizingFrequency() + " days")
+                            .pestAndDiseases(savedCrop.getPestAndDiseases())
+                            .photoUpload(savedCrop.getPhotoUpload())
+                            .quantity(savedCrop.getQuantity())
+                            .location(savedCrop.getLocation())
+                            .status(savedCrop.getStatus())
+                            .description(savedCrop.getDescription())
+                            .build())
+                    .build();
+
+        } catch (DataIntegrityViolationException e) {
+            throw new ConflictException("Data integrity issue: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Validation failed: " + e.getMessage());
+        } catch (Exception e) {
+            throw new IFarmServiceException("An error occurred while adding the crop: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public List<CropResponse> getAllCropsByUser(String username) {
+        List<Crop> crops = cropRepository.findByUser_Username(username);
+
+        return crops.stream()
+                .map(crop -> CropResponse.builder()
+                        .responseMessage("Crop Retrieved Successfully!")
+                        .cropInfo(CropInfo.builder()
+                                .cropName(crop.getCropName())
+                                .cropType(crop.getCropType())
+                                .sowDate(LocalDate.from(crop.getSowDate()))
+                                .harvestDate(LocalDate.from(crop.getHarvestDate()))
+                                .numberOfSeedlings(crop.getNumberOfSeedlings())
+                                .costOfSeedlings(crop.getCostOfSeedlings())
+                                .wateringFrequency("Every " + crop.getWateringFrequency() + " days")
+                                .fertilizingFrequency("Every " + crop.getFertilizingFrequency() + " days")
+                                .pestAndDiseases(crop.getPestAndDiseases())
+                                .photoUpload(crop.getPhotoUpload())
+                                .quantity(crop.getQuantity())
+                                .location(crop.getLocation())
+                                .status(crop.getStatus())
+                                .description(crop.getDescription())
+                                .build())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CropSummaryResponse> getCropSummaryByUser(String username) {
+        List<Crop> crops = cropRepository.findByUser_Username(username);
+        return crops.stream()
+                .map(crop -> CropSummaryResponse.builder()
+                        .responseMessage("Crop Retrieved Successfully!")
+                        .cropSummaryInfo(CropSummaryInfo.builder()
+                                .cropName(crop.getCropName())
+                                .status(crop.getStatus())
+                                .quantity(crop.getQuantity())
+                                .sowDate(LocalDate.from(crop.getSowDate()))
+                                .harvestDate(LocalDate.from(crop.getHarvestDate()))
+                                .build())
+                        .build())
+                .collect(Collectors.toList());
+
+    }
+}
 
 
 
-LiveStockRepository.java
+// LiveStockServiceImpl.java
+
+package org.ifarmr.service.impl;
+
+import org.ifarmr.entity.LiveStock;
+import org.ifarmr.entity.User;
+import org.ifarmr.exceptions.BadRequestException;
+import org.ifarmr.exceptions.ConflictException;
+import org.ifarmr.exceptions.IFarmServiceException;
+import org.ifarmr.exceptions.NotFoundException;
+import org.ifarmr.payload.request.LiveStockRequest;
+import org.ifarmr.payload.request.NotificationRequest;
+import org.ifarmr.payload.response.LiveStockInfo;
+import org.ifarmr.payload.response.LiveStockResponse;
+import org.ifarmr.payload.response.LivestockSummaryInfo;
+import org.ifarmr.payload.response.LivestockSummaryResponse;
+import org.ifarmr.repository.LiveStockRepository;
+import org.ifarmr.repository.UserRepository;
+import org.ifarmr.service.GlobalUploadService;
+import org.ifarmr.service.LiveStockService;
+import org.ifarmr.service.NotificationService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class LiveStockServiceImpl implements LiveStockService {
+
+    @Autowired
+    private LiveStockRepository liveStockRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private GlobalUploadService globalUploadService;
+
+    @Autowired
+    private NotificationService notificationService;
+
+    @Override
+    public LiveStockResponse addLiveStock(LiveStockRequest liveStockRequest, String username) {
+        try {
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new NotFoundException("User not found with username: " + username));
+
+            // Validate animal name
+            if (liveStockRequest.getAnimalName() == null || liveStockRequest.getAnimalName().isEmpty()) {
+                throw new BadRequestException("Animal name cannot be null or empty");
+            }
+
+            // Handle photo upload
+            String uploadedPhotoUrl = null;
+            if (liveStockRequest.getPhotoUpload() != null && !liveStockRequest.getPhotoUpload().isEmpty()) {
+                uploadedPhotoUrl = globalUploadService.uploadImage(liveStockRequest.getPhotoUpload());
+            }
+
+            // Create a LiveStock entity from the LiveStockRequest
+            LiveStock liveStock = LiveStock.builder()
+                    .animalName(liveStockRequest.getAnimalName())
+                    .animalType(liveStockRequest.getAnimalType())
+                    .breed(liveStockRequest.getBreed())
+                    .quantity(liveStockRequest.getQuantity())
+                    .age(liveStockRequest.getAge())
+                    .wateringFrequency(liveStockRequest.getWateringFrequency())
+                    .feedingSchedule(liveStockRequest.getFeedingSchedule())
+                    .vaccinationSchedule(liveStockRequest.getVaccinationSchedule())
+                    .healthIssues(liveStockRequest.getHealthIssues())
+                    .description(liveStockRequest.getDescription())
+                    .status(liveStockRequest.getStatus())
+                    .photoUpload(uploadedPhotoUrl)
+                    .location(liveStockRequest.getLocation())
+                    .user(user) // Set the current user to the livestock
+                    .build();
+
+            // Save the livestock entity to the database
+            LiveStock savedLiveStock = liveStockRepository.save(liveStock);
+
+            // SEND NOTIFICATION TO USER
+            NotificationRequest notificationRequest = new NotificationRequest();
+            notificationRequest.setTitle("New Livestock Added");
+            notificationRequest.setBody("A new Livestock has been added with name: " + liveStockRequest.getAnimalName());
+            notificationRequest.setTopic("Livestock Notifications");
+            notificationService.sendNotificationToUser(username, notificationRequest);
+
+            // Build and return the response
+            return LiveStockResponse.builder()
+                    .responseMessage("Livestock Added Successfully!")
+                    .liveStockInfo(LiveStockInfo.builder()
+                            .animalName(savedLiveStock.getAnimalName())
+                            .animalType(savedLiveStock.getAnimalType())
+                            .breed(savedLiveStock.getBreed())
+                            .quantity(savedLiveStock.getQuantity())
+                            .age(savedLiveStock.getAge())
+                            .wateringFrequency("Every " + savedLiveStock.getWateringFrequency() + " days")
+                            .feedingSchedule("Every " + savedLiveStock.getFeedingSchedule() + " days")
+                            .vaccinationSchedule("Every " + savedLiveStock.getVaccinationSchedule() + " days")
+                            .healthIssues(savedLiveStock.getHealthIssues())
+                            .description(savedLiveStock.getDescription())
+                            .status(savedLiveStock.getStatus())
+                            .photoUpload(savedLiveStock.getPhotoUpload())
+                            .location(savedLiveStock.getLocation())
+                            .build())
+                    .build();
+
+        } catch (DataIntegrityViolationException e) {
+            throw new ConflictException("Data integrity issue: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Validation failed: " + e.getMessage());
+        } catch (Exception e) {
+            throw new IFarmServiceException("An error occurred while adding the livestock: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public List<LiveStockResponse> getAllLiveStockByUser(String username) {
+        List<LiveStock> liveStockList = liveStockRepository.findByUser_Username(username);
+
+        return liveStockList.stream()
+                .map(liveStock -> LiveStockResponse.builder()
+                        .responseMessage("Livestock Retrieved Successfully!")
+                        .liveStockInfo(LiveStockInfo.builder()
+                                .animalName(liveStock.getAnimalName())
+                                .animalType(liveStock.getAnimalType())
+                                .breed(liveStock.getBreed())
+                                .quantity(liveStock.getQuantity())
+                                .age(liveStock.getAge())
+                                .wateringFrequency("Every " + liveStock.getWateringFrequency() + " days")
+                                .feedingSchedule("Every " + liveStock.getFeedingSchedule() + " days")
+                                .vaccinationSchedule("Every " + liveStock.getVaccinationSchedule() + " days")
+                                .healthIssues(liveStock.getHealthIssues())
+                                .description(liveStock.getDescription())
+                                .status(liveStock.getStatus())
+                                .photoUpload(liveStock.getPhotoUpload())
+                                .location(liveStock.getLocation())
+                                .build())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<LivestockSummaryResponse> getLivestockSummaryByUser(String username) {
+        List<LiveStock> liveStockList = liveStockRepository.findByUser_Username(username);
+        return liveStockList.stream()
+                .map(liveStock -> LivestockSummaryResponse.builder()
+                        .responseMessage("Livestock Retrieved Successfully!")
+                        .livestockSummaryInfo(LivestockSummaryInfo.builder()
+                                .animalName(liveStock.getAnimalName())
+                                .quantity(liveStock.getQuantity())
+                                .status(liveStock.getStatus())
+                                .location(liveStock.getLocation())
+                                .createdDate(liveStock.getDateCreated())
+                                .build())
+                        .build())
+                .collect(Collectors.toList());
+
+    }
+}
 
 
-CropServiceImpl.java
+// PostServiceImpl.java
 
+package org.ifarmr.service.impl;
 
-LiveStockServiceImpl.java
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import lombok.RequiredArgsConstructor;
+import org.ifarmr.entity.Comment;
+import org.ifarmr.entity.Like;
+import org.ifarmr.entity.Post;
+import org.ifarmr.entity.User;
+import org.ifarmr.exceptions.FileUploadException;
+import org.ifarmr.exceptions.NotFoundException;
+import org.ifarmr.payload.request.CommentDto;
+import org.ifarmr.payload.request.NotificationRequest;
+import org.ifarmr.payload.request.PostRequest;
+import org.ifarmr.payload.response.PopularPostResponse;
+import org.ifarmr.payload.response.PostResponse;
+import org.ifarmr.payload.response.UserSummary;
+import org.ifarmr.repository.CommentRepository;
+import org.ifarmr.repository.LikeRepository;
+import org.ifarmr.repository.PostRepository;
+import org.ifarmr.repository.UserRepository;
+import org.ifarmr.service.NotificationService;
+import org.ifarmr.service.PostService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
-PostServiceImpl.java
+@RequiredArgsConstructor
+@Service
+public class PostServiceImpl implements PostService {
+
+    private final UserRepository userRepository;
+    private final PostRepository postRepository;
+    private final Cloudinary cloudinary;
+
+    private final LikeRepository likeRepository;
+    private final CommentRepository commentRepository;
+
+    private final NotificationService notificationService;
+
+    @Override
+    public PostResponse createPost(PostRequest postRequest, String userName) {
+
+        // get the user who created the post
+        User user = userRepository.findByUsername(userName).orElse(null);
+
+        if (user == null) {
+            throw new NotFoundException("user not found");
+        }
+
+        String fileUrl = null;
+        MultipartFile file = postRequest.getFile();
+        if (file != null && !file.isEmpty()) {
+            try {
+                Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+                fileUrl = uploadResult.get("url").toString();
+            } catch (Exception e) {
+                throw new FileUploadException("Error uploading file to Cloudinary");
+            }
+        }
+
+        Post post = postRepository.save(Post.builder()
+                .title(postRequest.getTitle())
+                .content(postRequest.getContent())
+                .photoUrl(fileUrl)
+                .user(user)
+                .build()
+        );
+
+        // SEND NOTIFICATION TO ALL USERS
+        NotificationRequest notificationRequest = new NotificationRequest();
+        notificationRequest.setTitle("New Post Added");
+        notificationRequest.setBody("A new post has been added with title: " + post.getTitle());
+        notificationRequest.setTopic("Post Notifications");
+
+        try {
+            notificationService.sendNotificationToAll(userName,notificationRequest);
+        } catch (ExecutionException | InterruptedException e) {
+            // Handle exceptions
+            Thread.currentThread().interrupt(); // Restore interrupted state
+            throw new RuntimeException("Failed to send notification to all users", e);
+        }
+
+        return PostResponse.builder()
+                .message("Post created successfully")
+                .title(postRequest.getTitle())
+                .content(postRequest.getContent())
+                .photoUrl(fileUrl)
+                .dateCreated(post.getDateCreated())
+                .build();
+    }
+
+    @Override
+    public String likeOrUnlikePost(Long postId, String username) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("Post not found"));
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        Optional<Like> existingLike = likeRepository.findByPostIdAndUserId(postId, user.getId());
+
+        if (existingLike.isPresent()) {
+            likeRepository.delete(existingLike.get());
+
+            // SEND NOTIFICATION TO USER
+            NotificationRequest notificationRequest = new NotificationRequest();
+            notificationRequest.setTitle("New Like");
+            notificationRequest.setBody("A post/comment has been liked with title: " + post.getTitle());
+            notificationRequest.setTopic("Like Notifications");
+
+            try {
+                notificationService.sendNotificationToUser(username, notificationRequest);
+            } catch (ExecutionException | InterruptedException e) {
+                // Handle exceptions
+                Thread.currentThread().interrupt(); // Restore interrupted state
+                throw new RuntimeException("Failed to send notification to the user", e);
+            }
+
+            return "Post unliked successfully.";
+        } else {
+            Like like = new Like();
+            like.setPost(post);
+            like.setUser(user);
+            likeRepository.save(like);
+            return "Post liked successfully.";
+        }
+    }
+
+    @Override
+    public CommentDto commentOnPost(String username, CommentDto commentDto) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        Post post = postRepository.findById(commentDto.getPostId())
+                .orElseThrow(() -> new NotFoundException("Post not found"));
+
+        Comment comment = new Comment();
+        comment.setContent(commentDto.getContent());
+        comment.setParentContentId(commentDto.getParentContentId());
+        comment.setPost(post);
+        comment.setUser(user);
+
+        Comment savedComment = commentRepository.save(comment);
+
+        // Return the saved comment details as CommentDto
+        CommentDto savedCommentDto = new CommentDto();
+        savedCommentDto.setContent(savedComment.getContent());
+        savedCommentDto.setParentContentId(savedComment.getParentContentId());
+        savedCommentDto.setPostId(post.getId());  // Ensure that postId is part of CommentDto
+
+        // SEND NOTIFICATION TO USER
+        NotificationRequest notificationRequest = new NotificationRequest();
+        notificationRequest.setTitle("New Comment Added");
+        notificationRequest.setBody("A new comment has been added with title: " + post.getTitle());
+        notificationRequest.setTopic("Comment Notifications");
+
+        try {
+            notificationService.sendNotificationToUser(username, notificationRequest);
+        } catch (ExecutionException | InterruptedException e) {
+            // Handle exceptions
+            Thread.currentThread().interrupt(); // Restore interrupted state
+            throw new RuntimeException("Failed to send notification to the user", e);
+        }
+
+        return savedCommentDto;
+    }
+
+    @Override
+    public List<PostResponse> getPostsByUser(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        List<Post> userPosts = postRepository.findByUserId(user.getId());
+
+        return userPosts.stream()
+                .map(post -> PostResponse.builder()
+                        .title(post.getTitle())
+                        .content(post.getContent())
+                        .photoUrl(post.getPhotoUrl())
+                        .dateCreated(post.getDateCreated())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    public List<PopularPostResponse> getPopularPosts() {
+        List<Post> posts = postRepository.findAll();
+        // Sort posts based on the popularity score and return the top 3
+        return posts.stream()
+                .sorted(Comparator.comparingInt(this::popularityScore).reversed())
+                .limit(3)
+                .map(this::mapToPopularPostResponse)
+                .collect(Collectors.toList());
+    }
+    private int popularityScore(Post post) {
+        int commentWeight = 3;
+        int likeWeight = 1;
+
+        int totalComments = (post.getComments() != null) ? post.getComments().size() : 0;
+        int totalLikes = (post.getLikes() != null) ? post.getLikes().size() : 0;
+
+        return (totalComments * commentWeight) + (totalLikes * likeWeight);
+    }
+    private PopularPostResponse mapToPopularPostResponse(Post post) {
+        return PopularPostResponse.builder()
+                .title(post.getTitle())
+                .content(post.getContent())
+                .photoUrl(post.getPhotoUrl())
+                .dateCreated(post.getDateCreated())
+                .commentCount((post.getComments() != null) ? post.getComments().size() : 0)
+                .likeCount((post.getLikes() != null) ? post.getLikes().size() : 0)
+                .postedBy(mapToUserSummary(post.getUser()))
+                .commentedBy(mapCommentsToUserSummary(post.getComments()))
+                .build();
+    }
+
+        private UserSummary mapToUserSummary(User user) {
+            if (user == null) return null;
+            return UserSummary.builder()
+                    .name(user.getFullName())
+                    .photoUrl(user.getDisplayPhoto())
+                    .build();
+        }
+
+        private List<UserSummary> mapCommentsToUserSummary(List<Comment> comments) {
+            if (comments == null) return List.of();
+            return comments.stream()
+                    .sorted(Comparator.comparing(Comment::getDateCreated).reversed())
+                    .limit(3)
+                    .map(comment -> mapToUserSummary(comment.getUser()))
+                    .collect(Collectors.toList());
+        }
+
+}
