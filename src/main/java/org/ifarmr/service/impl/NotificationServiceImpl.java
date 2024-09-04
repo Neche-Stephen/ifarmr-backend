@@ -108,7 +108,7 @@ public class NotificationServiceImpl implements NotificationService {
             activities.add(RecentActivityDto.builder()
                     .icon("comment-icon") // Replace with appropriate icon
                     .title("New Comment on Your Post")
-                    .description(comment.getUser().getUsername() + " commented: \"" + comment.getContent() + "\"")
+                    .description(comment.getUser().getFullName() + " commented: \"" + comment.getContent() + "\"")
                     .timeAgo(calculateTimeAgo(comment.getDateCreated()))
                     .date(comment.getDateCreated().format(formatter))
                     .build());
@@ -133,10 +133,10 @@ public class NotificationServiceImpl implements NotificationService {
 
             if (like.getPost() != null) {
                 title = "Your Post Received a Like";
-                description = like.getUser().getUsername() + " liked your post: \"" + like.getPost().getTitle() + "\"";
+                description = like.getUser().getFullName() + " liked your post: \"" + like.getPost().getTitle() + "\"";
             } else if (like.getComment() != null) {
                 title = "Your Comment Received a Like";
-                description = like.getUser().getUsername() + " liked your comment: \"" + like.getComment().getContent() + "\"";
+                description = like.getUser().getFullName() + " liked your comment: \"" + like.getComment().getContent() + "\"";
             } else {
                 continue; // Skip if neither post nor comment is associated
             }
