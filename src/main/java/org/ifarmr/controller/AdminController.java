@@ -1,5 +1,6 @@
 package org.ifarmr.controller;
 
+import org.ifarmr.payload.response.AdminDashboardResponse;
 import org.ifarmr.payload.response.FarmerStatisticsResponse;
 import org.ifarmr.service.AdminService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,5 +26,10 @@ public class AdminController {
             @RequestParam(required = false) Boolean enabled
     ) {
         return adminService.getFarmerStatistics(gender, dateJoinedFrom, dateJoinedTo, enabled);
+    }
+//Api For Admin to get the dashboard-data
+    @GetMapping("/dashboard-data")
+    public AdminDashboardResponse getDashboardData() {
+        return adminService.getDashboardData();
     }
 }

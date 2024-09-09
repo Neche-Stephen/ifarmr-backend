@@ -1,8 +1,5 @@
 package org.ifarmr.payload.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -26,7 +23,7 @@ public class UserRegisterRequest {
     private String email;
 
     @NotBlank(message = "Username is required")
-    @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d]+$", message = "Username must contain at least one alphabet and one number, and only alphabets and numbers are allowed")
+    @Pattern(regexp = "^(?=.*[a-zA-Z])A(?=.*\\d)[a-zA-Z\\d]+$", message = "Username must contain at least one alphabet and one number, and only alphabets and numbers are allowed")
     private String userName;
 
     @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$%*?&])[A-Za-z\\d@$%*?&]{8,}$",
