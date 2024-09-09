@@ -218,7 +218,7 @@ public class PostServiceImpl implements PostService {
         // Sort posts based on the popularity score and return the top 3
         return posts.stream()
                 .sorted(Comparator.comparingInt(this::popularityScore).reversed())
-                .limit(3)
+                .limit(4)
                 .map(this::mapToPopularPostResponse)
                 .collect(Collectors.toList());
     }

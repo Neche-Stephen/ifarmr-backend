@@ -29,7 +29,7 @@ public class AuthController {
     public ResponseEntity<?> confirmEmail(@RequestParam("token") String token){
 
         String result = tokenValidationService.validateToken(token);
-        if ("Email confirmed successfully".equals(result)) {
+        if ("Email confirmed successfully!".equals(result)) {
             return ResponseEntity.ok(Collections.singletonMap("message", result));
         } else {
             return ResponseEntity.badRequest().body(Collections.singletonMap("message", result));
@@ -91,5 +91,16 @@ public class AuthController {
     }
 
 
+    @GetMapping("/validate-token")
+    public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String token) {
+        try {
+            String validTokenMessage = tokenValidationService.validateToken(token);
+            return ResponseEntity.ok(Collections.singletonMap("message", validTokenMessage));
+        } catch (TokenExpiredException e) {
+            return ResponseEntity.status(401).body(Collections.singletonMap("message", "Token expired"));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Collections.singletonMap("message", "Invalid token"));
+        }
+    }
 
 }
