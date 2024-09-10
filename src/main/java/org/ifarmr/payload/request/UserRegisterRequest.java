@@ -37,7 +37,5 @@ public class UserRegisterRequest {
     @NotNull(message = "Gender is required")
     private Gender gender;
 
-    @NotBlank(message = "Confirm Password is required")
-    private String confirmPassword;
 }
 
