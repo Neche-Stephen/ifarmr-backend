@@ -87,7 +87,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         for (Post post : posts) {
             activities.add(RecentActivityDto.builder()
-                    .icon("post-icon") // Replace with appropriate icon
+                    .icon("post") // Replace with appropriate icon
                     .title("New Post")
                     .description(post.getTitle())
                     .timeAgo(calculateTimeAgo(post.getDateCreated()))
@@ -106,7 +106,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         for (Comment comment : comments) {
             activities.add(RecentActivityDto.builder()
-                    .icon("comment-icon")
+                    .icon("comment")
                     .title("New Comment on Your Post")
                     .description(comment.getUser().getFullName() + " commented: \"" + comment.getContent() + "\"")
                     .timeAgo(calculateTimeAgo(comment.getDateCreated()))
@@ -138,7 +138,7 @@ public class NotificationServiceImpl implements NotificationService {
             }
 
             activities.add(RecentActivityDto.builder()
-                    .icon("like-icon")
+                    .icon("like")
                     .title(title)
                     .description(description)
                     .timeAgo(calculateTimeAgo(like.getDateCreated()))
@@ -158,7 +158,7 @@ public class NotificationServiceImpl implements NotificationService {
         for (Task task : tasks) {
             LocalDateTime dueDateTime = task.getDueDate().atStartOfDay(); // Convert LocalDate to LocalDateTime
             activities.add(RecentActivityDto.builder()
-                    .icon("task-icon") // Replace with appropriate icon
+                    .icon("task") // Replace with appropriate icon
                     .title("New Task")
                     .description(task.getTitle())
                     .timeAgo(calculateTimeAgo(dueDateTime))
@@ -178,7 +178,7 @@ public class NotificationServiceImpl implements NotificationService {
         for (Crop crop : crops) {
             LocalDateTime sowDateTime = crop.getSowDate().atStartOfDay(); // Convert LocalDate to LocalDateTime
             activities.add(RecentActivityDto.builder()
-                    .icon("crop-icon") // Replace with appropriate icon
+                    .icon("crop") // Replace with appropriate icon
                     .title("New Crop")
                     .description(crop.getCropName())
                     .timeAgo(calculateTimeAgo(sowDateTime))
@@ -198,7 +198,7 @@ public class NotificationServiceImpl implements NotificationService {
         for (Inventory inventory : inventories) {
             LocalDateTime acquiredDateTime = inventory.getDateAcquired().atStartOfDay(); // Convert LocalDate to LocalDateTime
             activities.add(RecentActivityDto.builder()
-                    .icon("inventory-icon") // Replace with appropriate icon
+                    .icon("inventory") // Replace with appropriate icon
                     .title("New Inventory")
                     .description(inventory.getName())
                     .timeAgo(calculateTimeAgo(acquiredDateTime))
@@ -217,7 +217,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         for (LiveStock liveStock : liveStocks) {
             activities.add(RecentActivityDto.builder()
-                    .icon("livestock-icon") // Replace with appropriate icon
+                    .icon("livestock") // Replace with appropriate icon
                     .title("New Livestock")
                     .description(liveStock.getAnimalName())
                     .timeAgo(calculateTimeAgo(liveStock.getDateCreated()))
@@ -236,7 +236,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         for (Ticket ticket : tickets) {
             activities.add(RecentActivityDto.builder()
-                    .icon("ticket-icon") // Replace with appropriate icon
+                    .icon("ticket") // Replace with appropriate icon
                     .title("New Ticket")
                     .description(ticket.getTitle())
                     .timeAgo(calculateTimeAgo(ticket.getDateCreated()))
