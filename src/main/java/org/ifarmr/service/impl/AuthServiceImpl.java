@@ -72,6 +72,10 @@ public class AuthServiceImpl implements AuthService{
             System.out.println("Invalid email domain. Email parts: " + Arrays.toString(emailParts));
             return "Invalid Email domain";
         }
+        // Check if passwords match
+        if (!userRegisterRequest.getPassword().equals(userRegisterRequest.getConfirmPassword())) {
+            return "Passwords do not match";
+        }
 
         Optional<User> existingUser = userRepository.findByEmail(userRegisterRequest.getEmail());
 
