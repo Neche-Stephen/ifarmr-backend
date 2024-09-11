@@ -39,7 +39,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegisterRequest userRegisterRequest) {
-
+//testing
         try {
             String registerUser = authService.registerUser(userRegisterRequest);
             if (!registerUser.equals("Invalid Email domain")) {

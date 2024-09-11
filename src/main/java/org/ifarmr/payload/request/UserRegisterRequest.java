@@ -28,7 +28,7 @@ public class UserRegisterRequest {
     @NotBlank(message = "Username is required")
     @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d]+$", message = "Username must contain at least one alphabet and one number, and only alphabets and numbers are allowed")
     private String userName;
-
+//testing it
     @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$%*?&])[A-Za-z\\d@$%*?&]{8,}$",
             message = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character")
     @NotBlank(message = "Password is required")
