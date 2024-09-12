@@ -2,6 +2,8 @@ package org.ifarmr.config;
 
 import lombok.RequiredArgsConstructor;
 import org.ifarmr.controller.NotificationTokenController;
+
+import org.ifarmr.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -33,12 +35,14 @@ public class SecurityConfig {
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+    private final UserService userService;
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity security) throws Exception {
         security.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        security.addFilterAfter(new LastActiveFilter(userService), UsernamePasswordAuthenticationFilter.class);
 
         security.csrf(CsrfConfigurer::disable)
                 .authorizeHttpRequests(

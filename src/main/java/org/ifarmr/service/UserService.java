@@ -16,4 +16,6 @@ public interface UserService {
 
     @Transactional
     List<Inventory> getInventoryForUser(User authenticatedUser);
+
+    void updateLastActive(String username);
 }

@@ -23,7 +23,7 @@ public class UserRegisterRequest {
     private String email;
 
     @NotBlank(message = "Username is required")
-    @Pattern(regexp = "^(?=.*[a-zA-Z])A(?=.*\\d)[a-zA-Z\\d]+$", message = "Username must contain at least one alphabet and one number, and only alphabets and numbers are allowed")
+    @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d]+$", message = "Username must contain at least one alphabet and one number, and only alphabets and numbers are allowed")
     private String userName;
 //testing it
     @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$%*?&])[A-Za-z\\d@$%*?&]{8,}$",

@@ -2,7 +2,11 @@ package org.ifarmr.controller;
 
 import org.ifarmr.payload.response.AdminDashboardResponse;
 import org.ifarmr.payload.response.FarmerStatisticsResponse;
+import org.ifarmr.payload.response.UserListResponse;
 import org.ifarmr.service.AdminService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,5 +35,16 @@ public class AdminController {
     @GetMapping("/dashboard-data")
     public AdminDashboardResponse getDashboardData() {
         return adminService.getDashboardData();
+    }
+
+    @GetMapping("/all-users")
+    public ResponseEntity<Page<UserListResponse>> getOnboardedUsers(){
+        int page = 0;
+        int size = 10;
+
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<UserListResponse> users = adminService.getOnboardedUsers(pageRequest);
+
+        return ResponseEntity.ok(users);
     }
 }
