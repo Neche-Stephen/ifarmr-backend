@@ -23,4 +23,10 @@ public class PostResponse {
     private String photoUrl;
 
     private LocalDateTime dateCreated;
+
+    private String userName;
+
+    private int likeCount;   // For number of likes
+
+    private int commentCount; // For number of comments
 }

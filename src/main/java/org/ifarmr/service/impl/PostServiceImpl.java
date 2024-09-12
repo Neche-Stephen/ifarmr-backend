@@ -186,6 +186,9 @@ public class PostServiceImpl implements PostService {
                         .content(post.getContent())
                         .photoUrl(post.getPhotoUrl())
                         .dateCreated(post.getDateCreated())
+                        .likeCount(likeRepository.countByPostId(post.getId())) // Set like count
+                        .commentCount(commentRepository.countByPostId(post.getId())) // Set comment count
+                        .userName(user.getUsername()) // Include userName in the response
                         .build())
                 .collect(Collectors.toList());
     }
