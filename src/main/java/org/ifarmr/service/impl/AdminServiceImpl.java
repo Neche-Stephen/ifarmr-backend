@@ -3,9 +3,13 @@ package org.ifarmr.service.impl;
 import org.ifarmr.entity.User;
 import org.ifarmr.payload.response.AdminDashboardResponse;
 import org.ifarmr.payload.response.FarmerStatisticsResponse;
+import org.ifarmr.payload.response.UserListResponse;
 import org.ifarmr.repository.UserRepository;
 import org.ifarmr.service.AdminService;
+import org.ifarmr.utils.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -70,5 +74,20 @@ public class AdminServiceImpl implements AdminService{
         long inactiveFarmers = totalFarmers - activeFarmers;
 
         return new AdminDashboardResponse(totalFarmers, activeFarmers, inactiveFarmers);
+    }
+
+    @Override
+    public Page<UserListResponse> getOnboardedUsers(Pageable pageable) {
+        Page<User> users = userRepository.findAll(pageable);
+        return users.map(user -> UserListResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .gender(user.getGender())
+                .dateJoined(DateUtil.formatDate(user.getDateJoined()))
+                .lastActive(DateUtil.formatDate(user.getLastActive()))
+
+
+                .build());
     }
 }

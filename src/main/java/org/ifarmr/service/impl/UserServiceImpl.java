@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -100,6 +102,23 @@ public class UserServiceImpl implements UserService {
         }
 
         return inventoryList;
+    }
+
+    @Override
+    public void updateLastActive(String username) {
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime lastActive = user.getLastActive();
+
+            // update if more than 5 minutes have passed since the last activity
+            if (lastActive == null || lastActive.plusMinutes(5).isBefore(now)) {
+                user.setLastActive(now);
+                userRepository.save(user);
+            }
+        }
     }
 
 }
