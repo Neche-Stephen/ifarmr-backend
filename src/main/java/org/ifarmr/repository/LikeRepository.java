@@ -19,4 +19,6 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
             "ORDER BY l.dateCreated DESC")
     List<Like> findLikesOnUserContent(@Param("userId") Long userId);
 
+    int countByPostId(Long postId);
+
 }
