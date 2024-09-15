@@ -27,10 +27,10 @@ public class InventoryRequest {
     private String  name;
 
     @NotBlank(message = "Quantity is required")
-    private Integer quantity;
+    private String quantity;
 
     @NotBlank(message = "Cost is required")
-    private Double cost;
+    private String cost;
 
     @NotBlank(message = "Location is required")
     private String location;

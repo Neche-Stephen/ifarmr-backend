@@ -5,11 +5,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 import org.ifarmr.enums.AnimalType;
-import org.ifarmr.enums.Status;
+import org.ifarmr.enums.Frequencies;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -32,19 +31,20 @@ public class LiveStock extends BaseClass {
 
     private String age;
 
-    private Integer wateringFrequency;
+    @Enumerated(EnumType.STRING)
+    private Frequencies wateringFrequency;
 
-    private Integer feedingSchedule;
+    @Enumerated(EnumType.STRING)
+    private Frequencies feedingSchedule;
 
-    private Integer vaccinationSchedule;
+    private LocalDate vaccinationSchedule;
 
     private String healthIssues;
 
     private String description;
 
-    @Enumerated(EnumType.STRING)
-    @NotNull
-    private Status status;
+
+    private String status;
 
     private String photoUpload;
 

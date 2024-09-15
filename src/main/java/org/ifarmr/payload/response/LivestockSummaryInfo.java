@@ -14,7 +14,7 @@ public class LivestockSummaryInfo {
 
     private String animalName;
     private String quantity;
-    private Status status;
+    private String status;
     private String location;
     private LocalDateTime createdDate;
 }

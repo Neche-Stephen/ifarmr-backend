@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.ifarmr.enums.CropType;
-import org.ifarmr.enums.Status;
+import org.ifarmr.enums.Frequencies;
 
 import java.time.LocalDate;
 
@@ -33,13 +33,15 @@ public class Crop extends BaseClass {
 
     private String costOfSeedlings;
 
-    private Integer wateringFrequency;
-
-    private Integer fertilizingFrequency;
+    @Enumerated(EnumType.STRING)
+    private Frequencies wateringFrequency;
 
     @Enumerated(EnumType.STRING)
-    @NotNull
-    private Status status;
+    private Frequencies fertilizingFrequency;
+
+    private String plantingSeason;
+
+    private String status;
 
     private String quantity;
 
