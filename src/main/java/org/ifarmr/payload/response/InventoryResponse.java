@@ -17,9 +17,9 @@ public class InventoryResponse {
 
     private String  name;
 
-    private Integer quantity;
+    private String quantity;
 
-    private Double cost;
+    private String cost;
 
     private String location;
 

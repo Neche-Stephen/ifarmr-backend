@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class CropSummaryInfo {
 
     private String cropName;
-    private Status status;
+    private String status;
     private String quantity;
     private LocalDate sowDate;
     private LocalDate harvestDate;

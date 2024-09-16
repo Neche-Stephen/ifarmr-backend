@@ -1,12 +1,10 @@
 package org.ifarmr.payload.response;
 
 import lombok.*;
-import org.ifarmr.entity.Crop;
 import org.ifarmr.enums.CropType;
-import org.ifarmr.enums.Status;
+import org.ifarmr.enums.Frequencies;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -20,13 +18,14 @@ public class CropInfo {
     private LocalDate harvestDate;
     private String numberOfSeedlings;
     private String costOfSeedlings;
-    private String wateringFrequency;
-    private String fertilizingFrequency;
+    private Frequencies wateringFrequency;
+    private Frequencies fertilizingFrequency;
     private String pestAndDiseases;
     private String photoUpload;
     private String quantity;
     private String location;
-    private Status status;
+    private String status;
+    private String plantingSeason;
     private String description;
 
 }

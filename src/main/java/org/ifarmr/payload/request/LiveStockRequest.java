@@ -1,11 +1,14 @@
 package org.ifarmr.payload.request;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.ifarmr.enums.AnimalType;
-import org.ifarmr.enums.Status;
+import org.ifarmr.enums.Frequencies;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -14,11 +17,12 @@ import org.springframework.web.multipart.MultipartFile;
 @Builder
 public class LiveStockRequest {
 
-    @NotNull(message = "Animal name is required")
-    @Size(min = 1, max = 30, message = "Animal name must be between 1 and 30 characters")
-    @NotNull
+//    @NotNull(message = "Animal name is required")
+//    @Size(min = 1, max = 30, message = "Animal name must be between 1 and 30 characters")
+//    @NotNull
     private String animalName;
 
+    @Enumerated(EnumType.STRING)
     private AnimalType animalType;
 
     private String breed;
@@ -30,18 +34,20 @@ public class LiveStockRequest {
     @NotNull(message = "This is required")
     private MultipartFile photoUpload;
 
-    private Integer wateringFrequency;
+    @Enumerated(EnumType.STRING)
+    private Frequencies wateringFrequency;
 
-    private Integer feedingSchedule;
+    @Enumerated(EnumType.STRING)
+    private Frequencies feedingSchedule;
 
-    private Integer vaccinationSchedule;
+    private LocalDate vaccinationSchedule;
 
     private String healthIssues;
 
     private String description;
 
-    @NotNull
-    private Status status;
+
+    private String status;
 
     private String location;
 

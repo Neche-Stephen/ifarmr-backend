@@ -47,7 +47,7 @@ public class InventoryServiceImpl implements InventoryService {
         MultipartFile file = inventoryRequest.getFile();
         if (file != null && !file.isEmpty()) {
             try {
-                FileUploadUtil.assertAllowed(file, FileUploadUtil.IMAGE_PATTERN);
+                //FileUploadUtil.assertAllowed(file, FileUploadUtil.IMAGE_PATTERN);
                 Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
                 fileUrl = uploadResult.get("url").toString();
             } catch (Exception e) {

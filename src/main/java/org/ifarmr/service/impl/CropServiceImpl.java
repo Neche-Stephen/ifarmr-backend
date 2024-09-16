@@ -46,7 +46,7 @@ public class CropServiceImpl implements CropService {
             // Handle photo upload
             String uploadedPhotoUrl = null;
             if (cropRequest.getPhotoUpload() != null && !cropRequest.getPhotoUpload().isEmpty()) {
-                FileUploadUtil.assertAllowed(cropRequest.getPhotoUpload(), FileUploadUtil.IMAGE_PATTERN);
+               // FileUploadUtil.assertAllowed(cropRequest.getPhotoUpload(), FileUploadUtil.IMAGE_PATTERN);
                 uploadedPhotoUrl = globalUploadService.uploadImage(cropRequest.getPhotoUpload());
             }
 
@@ -65,6 +65,7 @@ public class CropServiceImpl implements CropService {
                     .location(cropRequest.getLocation())
                     .status(cropRequest.getStatus())
                     .description(cropRequest.getDescription())
+                    .plantingSeason(cropRequest.getPlantingSeason())
                     .user(user)
                     .build();
 
@@ -86,13 +87,14 @@ public class CropServiceImpl implements CropService {
                             .harvestDate(LocalDate.from(savedCrop.getHarvestDate()))
                             .numberOfSeedlings(savedCrop.getNumberOfSeedlings())
                             .costOfSeedlings(savedCrop.getCostOfSeedlings())
-                            .wateringFrequency("Every " + savedCrop.getWateringFrequency() + " days")
-                            .fertilizingFrequency("Every " + savedCrop.getFertilizingFrequency() + " days")
+                            .wateringFrequency(savedCrop.getWateringFrequency())
+                            .fertilizingFrequency(savedCrop.getFertilizingFrequency())
                             .pestAndDiseases(savedCrop.getPestAndDiseases())
                             .photoUpload(savedCrop.getPhotoUpload())
                             .quantity(savedCrop.getQuantity())
                             .location(savedCrop.getLocation())
                             .status(savedCrop.getStatus())
+                            .plantingSeason(savedCrop.getPlantingSeason())
                             .description(savedCrop.getDescription())
                             .build())
                     .build();
@@ -120,8 +122,8 @@ public class CropServiceImpl implements CropService {
                                 .harvestDate(LocalDate.from(crop.getHarvestDate()))
                                 .numberOfSeedlings(crop.getNumberOfSeedlings())
                                 .costOfSeedlings(crop.getCostOfSeedlings())
-                                .wateringFrequency("Every " + crop.getWateringFrequency() + " days")
-                                .fertilizingFrequency("Every " + crop.getFertilizingFrequency() + " days")
+                                .wateringFrequency(crop.getWateringFrequency() )
+                                .fertilizingFrequency(crop.getFertilizingFrequency())
                                 .pestAndDiseases(crop.getPestAndDiseases())
                                 .photoUpload(crop.getPhotoUpload())
                                 .quantity(crop.getQuantity())

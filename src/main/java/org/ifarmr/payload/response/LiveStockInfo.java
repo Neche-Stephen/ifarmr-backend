@@ -1,9 +1,10 @@
 package org.ifarmr.payload.response;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.ifarmr.enums.AnimalType;
-import org.ifarmr.enums.Status;
+import org.ifarmr.enums.Frequencies;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -16,12 +17,12 @@ public class LiveStockInfo {
     private String breed;
     private String quantity;
     private String age;
-    private String wateringFrequency;
-    private String feedingSchedule;
-    private String vaccinationSchedule;
+    private Frequencies wateringFrequency;
+    private Frequencies feedingSchedule;
+    private LocalDate vaccinationSchedule;
     private String healthIssues;
     private String description;
-    private Status status;
+    private String status;
     private String photoUpload;
     private String location;
 }

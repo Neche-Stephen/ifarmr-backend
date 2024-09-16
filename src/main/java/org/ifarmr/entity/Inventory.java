@@ -23,9 +23,9 @@ public class Inventory extends BaseClass{
     @Enumerated(EnumType.STRING)
     private ItemType itemType;
 
-    private Integer quantity;
+    private String quantity;
 
-    private Double cost;
+    private String cost;
 
     private String photoUpload;
 
