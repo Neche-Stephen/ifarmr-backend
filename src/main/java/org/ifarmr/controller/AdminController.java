@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/admin")
 public class AdminController {
@@ -35,6 +37,12 @@ public class AdminController {
     @GetMapping("/dashboard-data")
     public AdminDashboardResponse getDashboardData() {
         return adminService.getDashboardData();
+    }
+
+    @GetMapping( "/stats")
+    public ResponseEntity<Map<String, Object>> getDashboardStats() {
+        Map<String, Object> dashboardStats = adminService.getDashboardStats();
+        return ResponseEntity.ok(dashboardStats);
     }
 
     @GetMapping("/all-users")
