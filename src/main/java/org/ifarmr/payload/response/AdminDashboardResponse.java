@@ -5,11 +5,13 @@ public class AdminDashboardResponse {
     private long totalFarmers;
     private long activeFarmers;
     private long inactiveFarmers;
+    private long newRegistration;
 
-    public AdminDashboardResponse(long totalFarmers, long activeFarmers, long inactiveFarmers){ //long totalOrders, //long completedOrders) {
+    public AdminDashboardResponse(long totalFarmers, long activeFarmers, long inactiveFarmers, long newRegistration){ //long totalOrders, //long completedOrders) {
         this.totalFarmers = totalFarmers;
         this.activeFarmers = activeFarmers;
         this.inactiveFarmers = inactiveFarmers;
+        this.newRegistration = newRegistration;
 
     }
 
@@ -37,4 +39,11 @@ public class AdminDashboardResponse {
         this.inactiveFarmers = inactiveFarmers;
     }
 
+    public long getNewRegistration() {
+        return newRegistration;
+    }
+
+    public void setNewRegistration(long newRegistration) {
+        this.newRegistration = newRegistration;
+    }
 }
