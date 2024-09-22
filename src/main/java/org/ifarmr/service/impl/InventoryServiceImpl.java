@@ -5,7 +5,6 @@ import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
 import org.ifarmr.entity.Inventory;
 import org.ifarmr.entity.User;
-import org.ifarmr.enums.ItemType;
 import org.ifarmr.exceptions.AlreadyExistsException;
 import org.ifarmr.exceptions.FileUploadException;
 import org.ifarmr.exceptions.FunctionErrorException;
@@ -13,16 +12,18 @@ import org.ifarmr.exceptions.NotFoundException;
 import org.ifarmr.payload.request.InventoryRequest;
 import org.ifarmr.payload.request.NotificationRequest;
 import org.ifarmr.payload.response.InventoryResponse;
+import org.ifarmr.payload.response.InventoriesResponse;
 import org.ifarmr.repository.InventoryRepository;
 import org.ifarmr.repository.UserRepository;
 import org.ifarmr.service.InventoryService;
 import org.ifarmr.service.NotificationService;
-import org.ifarmr.utils.FileUploadUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -101,5 +102,32 @@ public class InventoryServiceImpl implements InventoryService {
 
             return inventoryRepository.countByUser(user);
 
+    }
+
+    @Override
+    public InventoriesResponse getAllInventories() {
+        List<Inventory> inventories = inventoryRepository.findAll();
+        Long totalInventory = inventoryRepository.findTotalInventory();
+        Long totalInventoryValue = inventoryRepository.findTotalInventoryValue();
+
+        List<InventoryResponse> inventoryResponses = inventories.stream()
+                .map(inventory -> InventoryResponse.builder()
+                        .id(inventory.getId())
+                        .name(inventory.getName())
+                        .itemType(inventory.getItemType().name())
+                        .quantity(inventory.getQuantity())
+                        .cost(inventory.getCost())
+                        .photoUrl(inventory.getPhotoUpload())
+                        .location(inventory.getLocation())
+                        .dateAcquired(inventory.getDateAcquired())
+                        .currentState(inventory.getCurrentState())
+                        .build())
+                .collect(Collectors.toList());
+
+        return InventoriesResponse.builder()
+                .totalInventory(totalInventory)
+                .totalInventoryValue(totalInventoryValue)
+                .inventories(inventoryResponses)
+                .build();
     }
 }

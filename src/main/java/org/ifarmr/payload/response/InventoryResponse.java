@@ -13,6 +13,8 @@ import java.time.LocalDate;
 @Builder
 public class InventoryResponse {
 
+    private Long id;
+
     private String  itemType;
 
     private String  name;
