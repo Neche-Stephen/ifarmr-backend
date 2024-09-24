@@ -93,4 +93,10 @@ public class PostController {
 
         return postService.replyToComment(currentUsername, commentDto);
     }
+
+    @GetMapping("/comments/{commentId}/replies")
+    public ResponseEntity<List<CommentResponseDto>> getRepliesForComment(@PathVariable Long commentId){
+        List<CommentResponseDto> replies = postService.getRepliesForComment(commentId);
+        return ResponseEntity.ok(replies);
+    }
 }

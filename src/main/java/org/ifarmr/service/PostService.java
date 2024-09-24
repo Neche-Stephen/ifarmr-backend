@@ -28,4 +28,6 @@ public interface PostService {
     List<CommentResponseDto> getCommentsForPost(Long postId);
 
     CommentResponseDto replyToComment(String username, CommentDto commentDto);
+
+    List <CommentResponseDto> getRepliesForComment(Long commentId);
 }

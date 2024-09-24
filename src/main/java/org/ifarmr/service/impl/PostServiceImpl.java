@@ -154,18 +154,18 @@ public class PostServiceImpl implements PostService {
         // Get the owner of the post or comment
         User postOwner = post.getUser();
 
-        // Send notification to the owner of the post
-        //NotificationRequest notificationRequest = new NotificationRequest();
-        //notificationRequest.setTitle(generateCommentNotificationTitle(savedComment));
-        //notificationRequest.setBody(generateCommentNotificationDescription(savedComment));
-       // notificationRequest.setTopic("Comment Notifications");
+         //Send notification to the owner of the post
+        NotificationRequest notificationRequest = new NotificationRequest();
+        notificationRequest.setTitle(generateCommentNotificationTitle(savedComment));
+        notificationRequest.setBody(generateCommentNotificationDescription(savedComment));
+        notificationRequest.setTopic("Comment Notifications");
 
-       // try {
-        //    notificationService.sendNotificationToUser(postOwner.getUsername(), notificationRequest);
-        //} catch (ExecutionException | InterruptedException e) {
-         //   Thread.currentThread().interrupt();
-        //    throw new RuntimeException("Failed to send notification to the post owner", e);
-        //}
+        try {
+            notificationService.sendNotificationToUser(postOwner.getUsername(), notificationRequest);
+        } catch (ExecutionException | InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Failed to send notification to the post owner", e);
+        }
 
         // Return the saved comment details as CommentDto
         CommentResponseDto savedCommentDto = new CommentResponseDto();
@@ -268,6 +268,21 @@ public class PostServiceImpl implements PostService {
         savedReplyDto.setDateCreated(savedReply.getDateCreated());
 
         return savedReplyDto;
+    }
+
+    @Override
+    public List<CommentResponseDto> getRepliesForComment(Long commentId) {
+        List<Comment> replies = commentRepository.findByParentContentId(commentId);
+        return replies.stream()
+                .map(reply -> CommentResponseDto.builder()
+                        .commentId(reply.getId())
+                        .content(reply.getContent())
+                        .postId(reply.getPost().getId())
+                        .parentContentId(reply.getParentContentId())
+                        .fullName(reply.getUser().getFullName())
+                        .dateCreated(reply.getDateCreated())
+                        .build())
+                .collect(Collectors.toList() );
     }
 
     private String generateLikeNotificationTitle(Like like) {
