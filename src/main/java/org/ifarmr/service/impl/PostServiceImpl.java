@@ -25,6 +25,7 @@ import org.ifarmr.service.PostService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -134,7 +135,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public CommentDto commentOnPost(String username, CommentDto commentDto) {
+    public CommentResponseDto commentOnPost(String username, CommentDto commentDto) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
@@ -144,6 +145,7 @@ public class PostServiceImpl implements PostService {
         Comment comment = new Comment();
         comment.setContent(commentDto.getContent());
         comment.setParentContentId(commentDto.getParentContentId());
+        comment.setDateCreated(LocalDateTime.now());
         comment.setPost(post);
         comment.setUser(user);
 
@@ -153,20 +155,22 @@ public class PostServiceImpl implements PostService {
         User postOwner = post.getUser();
 
         // Send notification to the owner of the post
-        NotificationRequest notificationRequest = new NotificationRequest();
-        notificationRequest.setTitle(generateCommentNotificationTitle(savedComment));
-        notificationRequest.setBody(generateCommentNotificationDescription(savedComment));
-        notificationRequest.setTopic("Comment Notifications");
+        //NotificationRequest notificationRequest = new NotificationRequest();
+        //notificationRequest.setTitle(generateCommentNotificationTitle(savedComment));
+        //notificationRequest.setBody(generateCommentNotificationDescription(savedComment));
+       // notificationRequest.setTopic("Comment Notifications");
 
-        try {
-            notificationService.sendNotificationToUser(postOwner.getUsername(), notificationRequest);
-        } catch (ExecutionException | InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("Failed to send notification to the post owner", e);
-        }
+       // try {
+        //    notificationService.sendNotificationToUser(postOwner.getUsername(), notificationRequest);
+        //} catch (ExecutionException | InterruptedException e) {
+         //   Thread.currentThread().interrupt();
+        //    throw new RuntimeException("Failed to send notification to the post owner", e);
+        //}
 
         // Return the saved comment details as CommentDto
-        CommentDto savedCommentDto = new CommentDto();
+        CommentResponseDto savedCommentDto = new CommentResponseDto();
+        savedCommentDto.setCommentId(savedComment.getId());
+        savedCommentDto.setFullName(user.getFullName());
         savedCommentDto.setContent(savedComment.getContent());
         savedCommentDto.setParentContentId(savedComment.getParentContentId());
         savedCommentDto.setPostId(post.getId());
@@ -233,6 +237,37 @@ public class PostServiceImpl implements PostService {
                         .parentContentId(comment.getParentContentId())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public CommentResponseDto replyToComment(String username, CommentDto commentDto) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        Post post = postRepository.findById(commentDto.getPostId())
+                .orElseThrow(() -> new NotFoundException("Post not found"));
+
+        Comment parentComment = commentRepository.findById(commentDto.getParentContentId())
+                .orElseThrow(() -> new NotFoundException("Parent comment not found"));
+
+        Comment reply = new Comment();
+        reply.setContent(commentDto.getContent());
+        reply.setParentContentId(commentDto.getParentContentId());
+        reply.setDateCreated(LocalDateTime.now());
+        reply.setPost(post);
+        reply.setUser(user);
+
+        Comment savedReply = commentRepository.save(reply);
+
+        CommentResponseDto savedReplyDto = new CommentResponseDto();
+        savedReplyDto.setCommentId(savedReply.getId());
+        savedReplyDto.setContent(savedReply.getContent());
+        savedReplyDto.setParentContentId(savedReply.getParentContentId());
+        savedReplyDto.setPostId(post.getId());
+        savedReplyDto.setFullName(user.getFullName());
+        savedReplyDto.setDateCreated(savedReply.getDateCreated());
+
+        return savedReplyDto;
     }
 
     private String generateLikeNotificationTitle(Like like) {

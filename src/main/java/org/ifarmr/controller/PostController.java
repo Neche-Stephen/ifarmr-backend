@@ -46,7 +46,7 @@ public class PostController {
     }
 
     @PostMapping("/comment")
-    public CommentDto commentOnPost(@RequestBody CommentDto commentDto) {
+    public CommentResponseDto commentOnPost(@RequestBody CommentDto commentDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUsername = authentication.getName();
 
@@ -84,5 +84,13 @@ public class PostController {
     public ResponseEntity<List<CommentResponseDto>> getCommentsForPost(@PathVariable Long postId){
         List<CommentResponseDto> comments = postService.getCommentsForPost(postId);
         return ResponseEntity.ok(comments);
+    }
+
+    @PostMapping("/comments/reply")
+    public CommentResponseDto replyToComment(@RequestBody CommentDto commentDto){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+
+        return postService.replyToComment(currentUsername, commentDto);
     }
 }

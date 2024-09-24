@@ -15,7 +15,7 @@ public interface PostService {
 
     String likeOrUnlikePost(Long postId, String username);
 
-    CommentDto commentOnPost(String username, CommentDto commentDto);
+    CommentResponseDto commentOnPost(String username, CommentDto commentDto);
 
      List<PopularPostResponse> getPopularPosts();
 
@@ -26,4 +26,6 @@ public interface PostService {
     List<String> getLikesForPost(Long postId);
 
     List<CommentResponseDto> getCommentsForPost(Long postId);
+
+    CommentResponseDto replyToComment(String username, CommentDto commentDto);
 }
