@@ -3,6 +3,7 @@ package org.ifarmr.controller;
 import lombok.RequiredArgsConstructor;
 import org.ifarmr.payload.request.InventoryRequest;
 import org.ifarmr.payload.response.InventoryResponse;
+import org.ifarmr.payload.response.InventoriesResponse;
 import org.ifarmr.service.InventoryService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,12 @@ public class InventoryController {
     public ResponseEntity<Integer> getTotalInventory() {
         String username = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
         return ResponseEntity.ok(inventoryService.totalInventory(username));
+    }
+
+    @GetMapping
+    public ResponseEntity<InventoriesResponse> getAllInventories() {
+        InventoriesResponse response = inventoryService.getAllInventories();
+        return ResponseEntity.ok(response);
     }
 
 }
