@@ -72,4 +72,10 @@ public class PostController {
         PostResponse postResponse = postService.getPostDetails(postId);
         return ResponseEntity.ok(postResponse);
     }
+
+    @GetMapping("/{postId}/likes")
+    public ResponseEntity<List<String>> getLikesForPost(@PathVariable Long postId){
+        List<String> likes = postService.getLikesForPost(postId);
+        return ResponseEntity.ok(likes);
+    }
 }

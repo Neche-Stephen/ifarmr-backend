@@ -210,6 +210,14 @@ public class PostServiceImpl implements PostService {
                 .build();
     }
 
+    @Override
+    public List<String> getLikesForPost(Long postId) {
+        List<Like> likes = likeRepository.findByPostId(postId);
+        return likes.stream()
+                .map(like -> like.getUser().getUsername())
+                .collect(Collectors.toList());
+    }
+
     private String generateLikeNotificationTitle(Like like) {
         if (like.getPost() != null) {
             return "Your Post Received a Like";

@@ -21,4 +21,6 @@ public interface PostService {
     List<PostResponse> getPostsByUser(String username);
 
     PostResponse getPostDetails(Long postId);
+
+    List<String> getLikesForPost(Long postId);
 }
