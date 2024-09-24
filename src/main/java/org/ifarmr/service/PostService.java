@@ -3,6 +3,7 @@ package org.ifarmr.service;
 import org.ifarmr.entity.Post;
 import org.ifarmr.payload.request.CommentDto;
 import org.ifarmr.payload.request.PostRequest;
+import org.ifarmr.payload.response.CommentResponseDto;
 import org.ifarmr.payload.response.PopularPostResponse;
 import org.ifarmr.payload.response.PostResponse;
 
@@ -23,4 +24,6 @@ public interface PostService {
     PostResponse getPostDetails(Long postId);
 
     List<String> getLikesForPost(Long postId);
+
+    List<CommentResponseDto> getCommentsForPost(Long postId);
 }

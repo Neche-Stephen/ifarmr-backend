@@ -12,6 +12,7 @@ import org.ifarmr.exceptions.NotFoundException;
 import org.ifarmr.payload.request.CommentDto;
 import org.ifarmr.payload.request.NotificationRequest;
 import org.ifarmr.payload.request.PostRequest;
+import org.ifarmr.payload.response.CommentResponseDto;
 import org.ifarmr.payload.response.PopularPostResponse;
 import org.ifarmr.payload.response.PostResponse;
 import org.ifarmr.payload.response.UserSummary;
@@ -215,6 +216,22 @@ public class PostServiceImpl implements PostService {
         List<Like> likes = likeRepository.findByPostId(postId);
         return likes.stream()
                 .map(like -> like.getUser().getUsername())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CommentResponseDto> getCommentsForPost(Long postId) {
+        List<Comment> comments = commentRepository.findByPostId(postId);
+
+        return comments.stream()
+                .map(comment -> CommentResponseDto.builder()
+                        .commentId(comment.getId())
+                        .postId(postId)
+                        .content(comment.getContent())
+                        .fullName(comment.getUser().getFullName())
+                        .dateCreated(comment.getDateCreated())
+                        .parentContentId(comment.getParentContentId())
+                        .build())
                 .collect(Collectors.toList());
     }
 

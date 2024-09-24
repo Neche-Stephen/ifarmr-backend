@@ -13,4 +13,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findCommentsOnUserPosts(@Param("userId") Long userId);
 
     int countByPostId(Long postId);
+
+    List<Comment> findByPostId(Long postId);
 }
