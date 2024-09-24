@@ -19,4 +19,6 @@ public interface PostService {
      List<PopularPostResponse> getPopularPosts();
 
     List<PostResponse> getPostsByUser(String username);
+
+    PostResponse getPostDetails(Long postId);
 }

@@ -192,6 +192,24 @@ public class PostServiceImpl implements PostService {
                         .build())
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public PostResponse getPostDetails(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("Post not found"));
+
+        return PostResponse.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .photoUrl(post.getPhotoUrl())
+                .dateCreated(post.getDateCreated())
+                .fullName(post.getUser().getFullName())
+                .likeCount(likeRepository.countByPostId(postId))
+                .commentCount(commentRepository.countByPostId(postId))
+                .build();
+    }
+
     private String generateLikeNotificationTitle(Like like) {
         if (like.getPost() != null) {
             return "Your Post Received a Like";
