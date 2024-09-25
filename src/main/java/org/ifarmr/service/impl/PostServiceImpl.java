@@ -124,12 +124,12 @@ public class PostServiceImpl implements PostService {
             notificationRequest.setBody(generateLikeNotificationDescription(like));
             notificationRequest.setTopic("Like Notifications");
 
-            try {
-                notificationService.sendNotificationToUser(postOwner.getUsername(), notificationRequest);
-            } catch (ExecutionException | InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new RuntimeException("Failed to send notification to the post owner", e);
-            }
+            //try {
+            //    notificationService.sendNotificationToUser(postOwner.getUsername(), notificationRequest);
+            //} catch (ExecutionException | InterruptedException e) {
+             //   Thread.currentThread().interrupt();
+             //   throw new RuntimeException("Failed to send notification to the post owner", e);
+           // }
             return "Post liked successfully.";
         }
     }
@@ -161,7 +161,7 @@ public class PostServiceImpl implements PostService {
         //notificationRequest.setTopic("Comment Notifications");
 
         //try {
-        //    notificationService.sendNotificationToUser(postOwner.getUsername(), notificationRequest);
+         //   notificationService.sendNotificationToUser(postOwner.getUsername(), notificationRequest);
         //} catch (ExecutionException | InterruptedException e) {
         //    Thread.currentThread().interrupt();
          //   throw new RuntimeException("Failed to send notification to the post owner", e);
