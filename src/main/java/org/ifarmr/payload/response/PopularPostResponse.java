@@ -16,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class PopularPostResponse {
+    private Long id;
 
     private String title;
 

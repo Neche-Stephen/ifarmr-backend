@@ -331,6 +331,7 @@ public class PostServiceImpl implements PostService {
     }
     private PopularPostResponse mapToPopularPostResponse(Post post) {
         return PopularPostResponse.builder()
+                .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .photoUrl(post.getPhotoUrl())
