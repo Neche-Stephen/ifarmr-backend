@@ -23,6 +23,7 @@ public interface PostService {
 
     PostResponse getPostDetails(Long postId);
 
+
     List<String> getLikesForPost(Long postId);
 
     List<CommentResponseDto> getCommentsForPost(Long postId);

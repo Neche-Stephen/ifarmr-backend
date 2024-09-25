@@ -1,5 +1,6 @@
 package org.ifarmr.payload.response;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +19,7 @@ public class PostResponse {
     private String message;
 
     private String title;
+
 
     private String content;
 

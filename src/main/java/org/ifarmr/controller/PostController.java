@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/posts")
@@ -70,6 +71,7 @@ public class PostController {
 
     @GetMapping("/{postId}")
     public ResponseEntity<PostResponse> getPostDetails(@PathVariable Long postId){
+
         PostResponse postResponse = postService.getPostDetails(postId);
         return ResponseEntity.ok(postResponse);
     }

@@ -155,17 +155,17 @@ public class PostServiceImpl implements PostService {
         User postOwner = post.getUser();
 
          //Send notification to the owner of the post
-        NotificationRequest notificationRequest = new NotificationRequest();
-        notificationRequest.setTitle(generateCommentNotificationTitle(savedComment));
-        notificationRequest.setBody(generateCommentNotificationDescription(savedComment));
-        notificationRequest.setTopic("Comment Notifications");
+        //NotificationRequest notificationRequest = new NotificationRequest();
+        //notificationRequest.setTitle(generateCommentNotificationTitle(savedComment));
+        //notificationRequest.setBody(generateCommentNotificationDescription(savedComment));
+        //notificationRequest.setTopic("Comment Notifications");
 
-        try {
-            notificationService.sendNotificationToUser(postOwner.getUsername(), notificationRequest);
-        } catch (ExecutionException | InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("Failed to send notification to the post owner", e);
-        }
+        //try {
+        //    notificationService.sendNotificationToUser(postOwner.getUsername(), notificationRequest);
+        //} catch (ExecutionException | InterruptedException e) {
+        //    Thread.currentThread().interrupt();
+         //   throw new RuntimeException("Failed to send notification to the post owner", e);
+        //}
 
         // Return the saved comment details as CommentDto
         CommentResponseDto savedCommentDto = new CommentResponseDto();
@@ -187,6 +187,7 @@ public class PostServiceImpl implements PostService {
 
         return userPosts.stream()
                 .map(post -> PostResponse.builder()
+                        .id(post.getId())
                         .title(post.getTitle())
                         .content(post.getContent())
                         .photoUrl(post.getPhotoUrl())
@@ -197,7 +198,6 @@ public class PostServiceImpl implements PostService {
                         .build())
                 .collect(Collectors.toList());
     }
-
     @Override
     public PostResponse getPostDetails(Long postId) {
         Post post = postRepository.findById(postId)
@@ -210,10 +210,12 @@ public class PostServiceImpl implements PostService {
                 .photoUrl(post.getPhotoUrl())
                 .dateCreated(post.getDateCreated())
                 .fullName(post.getUser().getFullName())
-                .likeCount(likeRepository.countByPostId(postId))
-                .commentCount(commentRepository.countByPostId(postId))
+
+                .likeCount(likeRepository.countByPostId(postId)) // Count of likes
+                .commentCount(commentRepository.countByPostId(postId)) // Count of comments
                 .build();
     }
+
 
     @Override
     public List<String> getLikesForPost(Long postId) {
