@@ -68,9 +68,10 @@ public class InventoryServiceImpl implements InventoryService {
                .currentState(inventoryRequest.getCurrentState())
                .photoUpload(fileUrl)
                .build();
-        try{
-            inventoryRepository.save(newInventory);
 
+        inventoryRepository.save(newInventory);
+
+        try{
             // SEND NOTIFICATION TO USER
             NotificationRequest notificationRequest = new NotificationRequest();
             notificationRequest.setTitle("New Inventory Added");

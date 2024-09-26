@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -23,6 +24,7 @@ public class FCMInitializer {
 
     @PostConstruct
     public void initialize() {
+
         try (InputStream serviceAccount = new ByteArrayInputStream(firebaseConfig.getBytes())) {
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
