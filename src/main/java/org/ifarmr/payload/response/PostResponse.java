@@ -1,5 +1,6 @@
 package org.ifarmr.payload.response;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,10 +14,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class PostResponse {
+    private Long id;
 
     private String message;
 
     private String title;
+
 
     private String content;
 
@@ -25,6 +28,8 @@ public class PostResponse {
     private LocalDateTime dateCreated;
 
     private String userName;
+
+    private String fullName;
 
     private int likeCount;   // For number of likes
 

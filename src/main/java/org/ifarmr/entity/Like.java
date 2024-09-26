@@ -11,7 +11,7 @@ import lombok.*;
 @Entity
 @Getter
 @Setter
-@Table(name = "like_tbl")
+@Table(name = "like_tbl", uniqueConstraints = {@jakarta.persistence.UniqueConstraint(columnNames = {"post_id", "user_id"})})
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
