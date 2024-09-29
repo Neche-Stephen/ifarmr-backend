@@ -5,6 +5,7 @@ target/
 !**/src/test/**/target/
 .env
 rough
+src/main/resources/firebase.json
 ### STS ###
 .apt_generated
 .classpath
