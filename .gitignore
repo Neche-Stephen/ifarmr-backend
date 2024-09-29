@@ -5,7 +5,7 @@ target/
 !**/src/test/**/target/
 .env
 rough
-src/main/resources/firebase.json
+src/main/resources/ifarmr-firebase.json
 ### STS ###
 .apt_generated
 .classpath
