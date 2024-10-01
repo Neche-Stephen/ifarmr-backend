@@ -261,6 +261,23 @@ public class PostServiceImpl implements PostService {
 
         Comment savedReply = commentRepository.save(reply);
 
+
+        // Get the owner of the post or comment
+        User commentOwner = parentComment.getUser();
+
+        //Send notification to the owner of the post
+        NotificationRequest notificationRequest = new NotificationRequest();
+        notificationRequest.setTitle(generateCommentNotificationTitle(savedReply));
+        notificationRequest.setBody(generateCommentNotificationDescription(savedReply));
+        notificationRequest.setTopic("Comment Notifications");
+
+        try {
+            notificationService.sendNotificationToUser(commentOwner.getUsername(), notificationRequest);
+        } catch (ExecutionException | InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Failed to send notification to the comment owner", e);
+        }
+
         CommentResponseDto savedReplyDto = new CommentResponseDto();
         savedReplyDto.setCommentId(savedReply.getId());
         savedReplyDto.setContent(savedReply.getContent());

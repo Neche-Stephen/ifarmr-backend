@@ -14,4 +14,6 @@ public interface AdminService {
         AdminDashboardResponse getDashboardData(); // New method for fetching dashboard data
         Map<String, Object> getDashboardStats();
         Page<UserListResponse> getOnboardedUsers(Pageable pageable);
+        Map<String, Object> getUserStatistics();
+
 }

@@ -55,4 +55,11 @@ public class AdminController {
 
         return ResponseEntity.ok(users);
     }
+
+    @GetMapping("/user-statistics")
+    public ResponseEntity<Map<String, Object>> getUserStatistics() {
+        Map<String, Object> userStatistics = adminService.getUserStatistics();
+        return ResponseEntity.ok(userStatistics);
+    }
+
 }
