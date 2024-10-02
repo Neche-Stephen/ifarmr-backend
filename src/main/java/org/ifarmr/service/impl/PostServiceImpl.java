@@ -164,7 +164,6 @@ public class PostServiceImpl implements PostService {
             notificationService.sendNotificationToUser(postOwner.getUsername(), notificationRequest);
         } catch (ExecutionException | InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException("Failed to send notification to the post owner", e);
         }
 
         // Return the saved comment details as CommentDto
@@ -275,7 +274,6 @@ public class PostServiceImpl implements PostService {
             notificationService.sendNotificationToUser(commentOwner.getUsername(), notificationRequest);
         } catch (ExecutionException | InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException("Failed to send notification to the comment owner", e);
         }
 
         CommentResponseDto savedReplyDto = new CommentResponseDto();

@@ -26,9 +26,16 @@ public class NotificationTokenServiceImpl implements NotificationTokenService {
         return tokenRepository.findByUserId(userId);
     }
 
-    public boolean tokenExists(String token) {
-        return tokenRepository.existsByToken(token);
+    @Override
+    public boolean tokenExists(String username, String token) {
+        // Find the user by username to get userId
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        // Check by userId and token
+        return tokenRepository.existsByUserIdAndToken(user.getId(), token);
     }
+
 
     @Override
     @Transactional
