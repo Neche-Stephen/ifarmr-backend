@@ -124,12 +124,12 @@ public class PostServiceImpl implements PostService {
             notificationRequest.setBody(generateLikeNotificationDescription(like));
             notificationRequest.setTopic("Like Notifications");
 
-            //try {
-            //    notificationService.sendNotificationToUser(postOwner.getUsername(), notificationRequest);
-            //} catch (ExecutionException | InterruptedException e) {
-             //   Thread.currentThread().interrupt();
-             //   throw new RuntimeException("Failed to send notification to the post owner", e);
-           // }
+            try {
+                notificationService.sendNotificationToUser(postOwner.getUsername(), notificationRequest);
+            } catch (ExecutionException | InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("Failed to send notification to the post owner", e);
+            }
             return "Post liked successfully.";
         }
     }
@@ -155,17 +155,16 @@ public class PostServiceImpl implements PostService {
         User postOwner = post.getUser();
 
          //Send notification to the owner of the post
-        //NotificationRequest notificationRequest = new NotificationRequest();
-        //notificationRequest.setTitle(generateCommentNotificationTitle(savedComment));
-        //notificationRequest.setBody(generateCommentNotificationDescription(savedComment));
-        //notificationRequest.setTopic("Comment Notifications");
+        NotificationRequest notificationRequest = new NotificationRequest();
+        notificationRequest.setTitle(generateCommentNotificationTitle(savedComment));
+        notificationRequest.setBody(generateCommentNotificationDescription(savedComment));
+        notificationRequest.setTopic("Comment Notifications");
 
-        //try {
-         //   notificationService.sendNotificationToUser(postOwner.getUsername(), notificationRequest);
-        //} catch (ExecutionException | InterruptedException e) {
-        //    Thread.currentThread().interrupt();
-         //   throw new RuntimeException("Failed to send notification to the post owner", e);
-        //}
+        try {
+            notificationService.sendNotificationToUser(postOwner.getUsername(), notificationRequest);
+        } catch (ExecutionException | InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
 
         // Return the saved comment details as CommentDto
         CommentResponseDto savedCommentDto = new CommentResponseDto();
@@ -260,6 +259,22 @@ public class PostServiceImpl implements PostService {
         reply.setUser(user);
 
         Comment savedReply = commentRepository.save(reply);
+
+
+        // Get the owner of the post or comment
+        User commentOwner = parentComment.getUser();
+
+        //Send notification to the owner of the post
+        NotificationRequest notificationRequest = new NotificationRequest();
+        notificationRequest.setTitle(generateCommentNotificationTitle(savedReply));
+        notificationRequest.setBody(generateCommentNotificationDescription(savedReply));
+        notificationRequest.setTopic("Comment Notifications");
+
+        try {
+            notificationService.sendNotificationToUser(commentOwner.getUsername(), notificationRequest);
+        } catch (ExecutionException | InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
 
         CommentResponseDto savedReplyDto = new CommentResponseDto();
         savedReplyDto.setCommentId(savedReply.getId());

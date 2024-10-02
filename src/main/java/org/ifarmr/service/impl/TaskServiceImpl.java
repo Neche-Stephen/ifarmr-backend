@@ -60,7 +60,6 @@ public class TaskServiceImpl implements TaskService {
         try {
             taskRepository.save(task);
 
-            // SEND NOTIFICATION TO USER
             NotificationRequest notificationRequest = new NotificationRequest();
             notificationRequest.setTitle("New Task Added");
             notificationRequest.setBody("A new task has been added with title: " + task.getTitle());
@@ -68,7 +67,7 @@ public class TaskServiceImpl implements TaskService {
             notificationService.sendNotificationToUser(currentUsername, notificationRequest);
 
         } catch (Exception e) {
-            throw new IFarmServiceException("An error occurred while saving the task", e);
+            //throw new IFarmServiceException("An error occurred while saving the task", e);
         }
 
 

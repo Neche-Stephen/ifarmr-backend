@@ -79,12 +79,16 @@ public class LiveStockServiceImpl implements LiveStockService {
             // Save the livestock entity to the database
             LiveStock savedLiveStock = liveStockRepository.save(liveStock);
 
-            // SEND NOTIFICATION TO USER
-            NotificationRequest notificationRequest = new NotificationRequest();
-            notificationRequest.setTitle("New Livestock Added");
-            notificationRequest.setBody("A new Livestock has been added with name: " + liveStockRequest.getAnimalName());
-            notificationRequest.setTopic("Livestock Notifications");
-            notificationService.sendNotificationToUser(username, notificationRequest);
+
+            try {
+                NotificationRequest notificationRequest = new NotificationRequest();
+                notificationRequest.setTitle("New Livestock Added");
+                notificationRequest.setBody("A new Livestock has been added with name: " + liveStockRequest.getAnimalName());
+                notificationRequest.setTopic("Livestock Notifications");
+                notificationService.sendNotificationToUser(username, notificationRequest);
+            } catch (Exception e) {
+                //logger.error("Failed to send notification for new inventory {}: {}", inventoryRequest.getName(), e.getMessage(), e);
+            }
 
             // Build and return the response
             return LiveStockResponse.builder()

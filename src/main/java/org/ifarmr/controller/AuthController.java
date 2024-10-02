@@ -85,11 +85,11 @@ public class AuthController {
     }
 
     @PostMapping("/reset")
-    public ResponseEntity<?> confirmPasswordReset(@RequestParam("token") String token, @Valid @RequestBody ConfirmPasswordRequest confirmPasswordRequest) throws MessagingException {
-        String response = authService.confirmResetPassword(token, confirmPasswordRequest);
+    public ResponseEntity<?> confirmPasswordReset(@Valid @RequestBody ConfirmPasswordRequest confirmPasswordRequest) throws MessagingException {
+        // The token will now come from confirmPasswordRequest, not from the URL
+        String response = authService.confirmResetPassword(confirmPasswordRequest.getToken(), confirmPasswordRequest);
         return ResponseEntity.ok(response);
     }
-
 
     @GetMapping("/validate-token")
     public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String token) {

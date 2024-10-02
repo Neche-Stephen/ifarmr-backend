@@ -17,6 +17,6 @@ public class NotificationToken extends BaseClass {
     @Column(nullable = false)
     private Long userId;  // User ID associated with the token
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String token;  // Token should be unique and not null
 }

@@ -284,29 +284,40 @@ public class NotificationServiceImpl implements NotificationService {
     // FIREBASE NOTIFICATION METHODS BELOW;
 
     @Override
-    public void sendNotificationToUser(String username, NotificationRequest request) throws ExecutionException, InterruptedException {
-        User user = findUserByUsername(username);
-        List<NotificationToken> tokens = notificationTokenService.getTokensByUserId(user.getId());
+    public void sendNotificationToUser(String username, NotificationRequest request) {
+        try {
+            User user = findUserByUsername(username);
+            List<NotificationToken> tokens = notificationTokenService.getTokensByUserId(user.getId());
 
-        if (tokens.isEmpty()) {
-            throw new RuntimeException("No tokens found for user with ID: " + user.getId());
-        }
+            if (tokens.isEmpty()) {
+                logger.warn("No tokens found for user with ID: {}", user.getId());
+                return; // Return to prevent throwing an exception
+            }
 
-        for (NotificationToken token : tokens) {
-            request.setToken(token.getToken());
-            fcmService.sendMessageToToken(request);
+            for (NotificationToken token : tokens) {
+                request.setToken(token.getToken());
+                fcmService.sendMessageToToken(request);
+            }
+        } catch (Exception e) {
+            logger.error("Error sending notification to user {}: {}", username, e.getMessage(), e);
+            // Do not rethrow the exception, simply log it
         }
     }
 
     @Override
-    public void sendNotificationToAll(String username, NotificationRequest request) throws ExecutionException, InterruptedException {
-        // No need to validate the username if this is for all users,
-        // but you might want to log or audit who initiated the action.
-        List<NotificationToken> tokens = tokenRepository.findAll();
+    public void sendNotificationToAll(String username, NotificationRequest request) {
+        try {
+            // No need to validate the username if this is for all users,
+            // but you might want to log or audit who initiated the action.
+            List<NotificationToken> tokens = tokenRepository.findAll();
 
-        for (NotificationToken token : tokens) {
-            request.setToken(token.getToken());
-            fcmService.sendMessageToToken(request);
+            for (NotificationToken token : tokens) {
+                request.setToken(token.getToken());
+                fcmService.sendMessageToToken(request);
+            }
+        } catch (Exception e) {
+            logger.error("Error sending notification to all users: {}", e.getMessage(), e);
+            // Do not rethrow the exception, simply log it
         }
     }
 
