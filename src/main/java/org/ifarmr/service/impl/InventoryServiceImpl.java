@@ -68,18 +68,18 @@ public class InventoryServiceImpl implements InventoryService {
                .currentState(inventoryRequest.getCurrentState())
                .photoUpload(fileUrl)
                .build();
-        try{
-            inventoryRepository.save(newInventory);
 
+        inventoryRepository.save(newInventory);
+
+        try {
             // SEND NOTIFICATION TO USER
             NotificationRequest notificationRequest = new NotificationRequest();
             notificationRequest.setTitle("New Inventory Added");
             notificationRequest.setBody("A new inventory has been created with name: " + inventoryRequest.getName());
             notificationRequest.setTopic("Inventory Notifications");
             notificationService.sendNotificationToUser(username, notificationRequest);
-
-        }catch (Exception e){
-            throw new FunctionErrorException("Unable to save your inventory");
+        } catch (Exception e) {
+            //logger.error("Failed to send notification for new inventory {}: {}", inventoryRequest.getName(), e.getMessage(), e);
         }
 
 

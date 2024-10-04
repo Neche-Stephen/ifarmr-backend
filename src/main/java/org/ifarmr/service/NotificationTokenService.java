@@ -12,5 +12,6 @@ public interface NotificationTokenService {
 
     void deleteToken(String username, String token);  // Updated to accept username
 
-    boolean tokenExists(String token);
+    boolean tokenExists(String username, String token);
+
 }

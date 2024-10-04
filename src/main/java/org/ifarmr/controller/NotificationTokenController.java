@@ -28,7 +28,8 @@ public class NotificationTokenController {
         String userName = authentication.getName();
 
         try {
-            boolean tokenExists = tokenService.tokenExists(tokenRequest.getToken());
+            // Fetch userId from username
+            boolean tokenExists = tokenService.tokenExists(userName, tokenRequest.getToken());
             if (tokenExists) {
                 return ResponseEntity.status(409).body("Token already exists.");
             } else {

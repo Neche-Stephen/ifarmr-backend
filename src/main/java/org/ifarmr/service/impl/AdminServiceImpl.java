@@ -1,6 +1,7 @@
 package org.ifarmr.service.impl;
 
 import org.ifarmr.entity.User;
+import org.ifarmr.enums.Gender;
 import org.ifarmr.payload.response.AdminDashboardResponse;
 import org.ifarmr.payload.response.FarmerStatisticsResponse;
 import org.ifarmr.payload.response.UserListResponse;
@@ -151,4 +152,35 @@ public class AdminServiceImpl implements AdminService{
 
                 .build());
     }
+
+    @Override
+    public Map<String, Object> getUserStatistics() {
+        Map<String, Object> statistics = new HashMap<>();
+
+        // Line chart data: Monthly user registration count
+        List<Long> monthlyUserRegistration = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+
+        for (int month = 1; month <= 12; month++) {
+            LocalDate startOfMonth = LocalDate.of(today.getYear(), month, 1);
+            LocalDate endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.lengthOfMonth());
+            long userCountForMonth = userRepository.countUsersByDateJoinedBetween(startOfMonth.atStartOfDay(), endOfMonth.atTime(23, 59, 59));
+            monthlyUserRegistration.add(userCountForMonth);
+        }
+
+        // Pie chart data: User demographics by gender
+        long maleUsers = userRepository.countByGender(Gender.MALE);
+        long femaleUsers = userRepository.countByGender(Gender.FEMALE);
+
+        Map<String, Long> genderDistribution = new HashMap<>();
+        genderDistribution.put("Male", maleUsers);
+        genderDistribution.put("Female", femaleUsers);
+
+        // Add both line chart and pie chart data to the response
+        statistics.put("monthlyUserRegistration", monthlyUserRegistration);
+        statistics.put("genderDistribution", genderDistribution);
+
+        return statistics;
+    }
+
 }
